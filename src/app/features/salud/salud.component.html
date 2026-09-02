@@ -1,0 +1,155 @@
+<div class="salud-wrapper">
+
+    <!-- ================= VISTA 1: TABLA Y FILTROS DE SALUD ================= -->
+    <div *ngIf="vistaActual === 'lista'">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>Control de <span class="text-accent">Salud e Higiene</span></h1>
+                <p>Registro de vacunas, desparasitaciones, enfermedades y revisiones.</p>
+            </div>
+            <button class="btn-primary" (click)="cambiarVista('formulario')">
+                <span class="material-symbols-outlined">add</span>
+                Registrar Evento Clínico
+            </button>
+        </header>
+
+        <!-- Barra de Filtros -->
+        <div class="filters-card">
+            <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar por arete, nombre o tratamiento...">
+            </div>
+            <div class="filter-group">
+                <select [(ngModel)]="filtroTipo" class="filter-select">
+                    <option value="">Todos los Tipos</option>
+                    <option value="Vacuna">Vacuna</option>
+                    <option value="Desparasitante">Desparasitante</option>
+                    <option value="Enfermedad">Enfermedad</option>
+                    <option value="Revisión Rutina">Revisión Rutina</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla de Eventos Sanitarios -->
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Animal / Arete</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Diagnóstico</th>
+                        <th>Tratamiento Aplicado</th>
+                        <th>Dosis</th>
+                        <th>Próxima Revisión</th>
+                        <th>Veterinario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let evento of eventosFiltrados">
+                        <td>
+                            <div class="animal-cell">
+                                <span class="arete">{{ evento.animalId }}</span>
+                                <span class="nombre-alias">{{ evento.nombreAnimal || 'Sin alias' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-chip" [ngClass]="{
+                                'vacuna': evento.tipo === 'Vacuna',
+                                'desparasitante': evento.tipo === 'Desparasitante',
+                                'enfermedad': evento.tipo === 'Enfermedad',
+                                'revision': evento.tipo === 'Revisión Rutina'
+                            }">{{ evento.tipo }}</span>
+                        </td>
+                        <td>{{ evento.fecha | date:'shortDate' }}</td>
+                        <td>{{ evento.diagnostico || 'N/D' }}</td>
+                        <td><strong>{{ evento.tratamientoAplicado }}</strong></td>
+                        <td>{{ evento.dosis || 'N/D' }}</td>
+                        <td>{{ evento.proximaRevision ? (evento.proximaRevision | date:'shortDate') : 'N/A' }}</td>
+                        <td>{{ evento.veterinarioEncargado }}</td>
+                    </tr>
+                    <tr *ngIf="eventosFiltrados.length === 0">
+                        <td colspan="8" class="empty-message">No se encontraron registros clínicos con los filtros
+                            actuales.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- ================= VISTA 2: FORMULARIO DE NUEVO EVENTO ================= -->
+    <div *ngIf="vistaActual === 'formulario'" class="form-container-wrapper">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>Nuevo <span class="text-accent">Registro Clínico</span></h1>
+                <p>Anota los detalles de la aplicación médica o revisión del animal.</p>
+            </div>
+            <button class="btn-secondary" (click)="cambiarVista('lista')">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Regresar al Historial
+            </button>
+        </header>
+
+        <form (ngSubmit)="guardarEventoSalud()" class="bovine-form">
+            <div class="form-card">
+                <h3>Detalles del Expediente Clínico</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Arete SINIIGA (Animal ID) *</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.animalId" name="animalId"
+                            placeholder="Ej. 01 2345 6789" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre o Alias (Opcional)</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.nombreAnimal" name="nombreAnimal"
+                            placeholder="Ej. La Pinta">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Evento *</label>
+                        <select [(ngModel)]="nuevoEvento.tipo" name="tipo" required>
+                            <option value="Vacuna">Vacuna</option>
+                            <option value="Desparasitante">Desparasitante</option>
+                            <option value="Enfermedad">Enfermedad</option>
+                            <option value="Revisión Rutina">Revisión Rutina</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Aplicación *</label>
+                        <input type="date" [(ngModel)]="nuevoEvento.fecha" name="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Dosis *</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.dosis" name="dosis" placeholder="Ej. 10 ml / 5 cc"
+                            required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Tratamiento Aplicado / Producto *</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.tratamientoAplicado" name="tratamientoAplicado"
+                            placeholder="Ej. Oxitetraciclina / Ivermectina" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Diagnóstico (Opcional)</label>
+                        <textarea [(ngModel)]="nuevoEvento.diagnostico" name="diagnostico" rows="2"
+                            placeholder="Motivo de la consulta o hallazgo clínico..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Próxima Revisión / Refuerzo (Opcional)</label>
+                        <input type="date" [(ngModel)]="nuevoEvento.proximaRevision" name="proximaRevision">
+                    </div>
+                    <div class="form-group">
+                        <label>Veterinario Encargado *</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.veterinarioEncargado" name="veterinarioEncargado"
+                            placeholder="Ej. Dr. Roberto Gómez" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" (click)="cambiarVista('lista')">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar Expediente Clínico</button>
+            </div>
+        </form>
+    </div>
+
+</div>

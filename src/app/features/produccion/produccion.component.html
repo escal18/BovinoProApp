@@ -1,0 +1,190 @@
+<div class="produccion-wrapper">
+
+    <!-- ================= VISTA 1: TABLA Y RESUMEN ================= -->
+    <div *ngIf="vistaActual === 'lista'">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>Control y <span class="text-accent">Corte de Producción</span></h1>
+                <p>Acumulado semanal, control de tanque y auditoría frente a ventas.</p>
+            </div>
+            <button class="btn-primary" (click)="cambiarVista('formulario')">
+                <span class="material-symbols-outlined">add</span>
+                Registrar Ordeña
+            </button>
+        </header>
+
+        <!-- Tarjetas de Resumen -->
+        <div class="metrics-grid">
+            <div class="metric-card highlight">
+                <span class="metric-label">Acumulado de la Semana</span>
+                <span class="metric-value">{{ totalLitrosSemana }} <small>Litros</small></span>
+                <span class="metric-subtext">Se reinicia cada domingo</span>
+            </div>
+            <div class="metric-card" [ngClass]="{'warning-border': diferenciaTotalSemana !== 0}">
+                <span class="metric-label">Diferencia Total (Producido vs Vendido)</span>
+                <span class="metric-value"
+                    [ngStyle]="{'color': diferenciaTotalSemana < 0 ? '#dc2626' : (diferenciaTotalSemana > 0 ? '#16a34a' : '#0f172a')}">
+                    {{ diferenciaTotalSemana > 0 ? '+' + diferenciaTotalSemana : diferenciaTotalSemana }}
+                    <small>L</small>
+                </span>
+                <span class="metric-subtext">Balance de mermas / sobrantes</span>
+            </div>
+        </div>
+
+        <!-- Barra de Filtros -->
+        <div class="filters-card">
+            <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar por tanque, arete o responsable...">
+            </div>
+            <div class="filter-group">
+                <select [(ngModel)]="filtroTurno" class="filter-select">
+                    <option value="">Ambos Turnos</option>
+                    <option value="Mañana">Mañana</option>
+                    <option value="Tarde">Tarde</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Destino / Tanque</th>
+                        <th>Fecha</th>
+                        <th>Turno</th>
+                        <th>Producidos</th>
+                        <th>Vendidos</th>
+                        <th>Diferencia</th>
+                        <th>Calidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let reg of registrosFiltrados">
+                        <td>
+                            <div class="animal-cell">
+                                <span class="arete">{{ reg.tipoRegistro === 'Tanque General' ? (reg.loteGrupo || 'Tanque
+                                    General') : reg.animalId }}</span>
+                                <span class="nombre-alias">{{ reg.tipoRegistro }}</span>
+                            </div>
+                        </td>
+                        <td>{{ reg.fecha | date:'shortDate' }}</td>
+                        <td>
+                            <span class="status-chip" [ngClass]="{
+                                'matutina': reg.turno === 'Mañana',
+                                'vespertina': reg.turno === 'Tarde'
+                            }">{{ reg.turno }}</span>
+                        </td>
+                        <td><strong>{{ reg.litrosProducidos }} L</strong></td>
+                        <td>{{ reg.litrosVendidos !== undefined ? reg.litrosVendidos + ' L' : 'Pendiente venta' }}</td>
+                        <td>
+                            <span *ngIf="reg.diferencia !== undefined" class="diff-badge" [ngClass]="{
+                                'neutral': reg.diferencia === 0,
+                                'positive': reg.diferencia > 0,
+                                'negative': reg.diferencia < 0
+                            }">
+                                {{ reg.diferencia > 0 ? '+' + reg.diferencia : reg.diferencia }} L
+                            </span>
+                            <span *ngIf="reg.diferencia === undefined" class="pending-text">Sin auditar</span>
+                        </td>
+                        <td>{{ reg.calidadLeche || 'N/D' }}</td>
+                        <td>
+                            <button class="action-btn edit" (click)="cambiarVista('formulario', reg)"
+                                title="Registrar Venta / Editar">
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="registrosFiltrados.length === 0">
+                        <td colspan="8" class="empty-message">No se encontraron registros con los filtros actuales.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- ================= VISTA 2: FORMULARIO (ALTA / EDICIÓN) ================= -->
+    <div *ngIf="vistaActual === 'formulario'" class="form-container-wrapper">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>{{ modoEdicion ? 'Actualizar Ordeña o' : 'Nuevo' }} <span class="text-accent">Registro de
+                        Venta</span></h1>
+                <p>{{ modoEdicion ? 'Agrega o ajusta los litros vendidos para completar la auditoría.' : 'Registra
+                    primero los litros del tanque y complementa después con la venta.' }}</p>
+            </div>
+            <button class="btn-secondary" (click)="cambiarVista('lista')">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Regresar
+            </button>
+        </header>
+
+        <form (ngSubmit)="guardarProduccion()" class="bovine-form">
+            <div class="form-card">
+                <h3>Detalles de Producción y Auditoría de Venta</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tipo de Registro *</label>
+                        <select [(ngModel)]="nuevoRegistro.tipoRegistro" name="tipoRegistro" required>
+                            <option value="Tanque General">Tanque General</option>
+                            <option value="Individual">Individual (Vaca específica)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" *ngIf="nuevoRegistro.tipoRegistro === 'Individual'">
+                        <label>Arete SINIIGA / Nombre *</label>
+                        <input type="text" [(ngModel)]="nuevoRegistro.animalId" name="animalId"
+                            placeholder="Ej. 01 2345 6789 (La Pinta)">
+                    </div>
+
+                    <div class="form-group" *ngIf="nuevoRegistro.tipoRegistro === 'Tanque General'">
+                        <label>Identificador de Tanque / Lote *</label>
+                        <input type="text" [(ngModel)]="nuevoRegistro.loteGrupo" name="loteGrupo"
+                            placeholder="Ej. Tanque Principal de Granja">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha *</label>
+                        <input type="date" [(ngModel)]="nuevoRegistro.fecha" name="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Turno *</label>
+                        <select [(ngModel)]="nuevoRegistro.turno" name="turno" required>
+                            <option value="Mañana">Mañana</option>
+                            <option value="Tarde">Tarde</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Litros Producidos (Báscula / Tanque) *</label>
+                        <input type="number" step="0.1" [(ngModel)]="nuevoRegistro.litrosProducidos"
+                            name="litrosProducidos" placeholder="Ej. 345.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Litros Vendidos / Entregados (Auditoría)</label>
+                        <input type="number" step="0.1" [(ngModel)]="nuevoRegistro.litrosVendidos" name="litrosVendidos"
+                            placeholder="Ej. 347.0 (Llenar al vender)">
+                    </div>
+                    <div class="form-group">
+                        <label>Calidad de Leche</label>
+                        <input type="text" [(ngModel)]="nuevoRegistro.calidadLeche" name="calidadLeche"
+                            placeholder="Ej. Excelente">
+                    </div>
+                    <div class="form-group">
+                        <label>Registrado Por *</label>
+                        <input type="text" [(ngModel)]="nuevoRegistro.registradoPor" name="registradoPor"
+                            placeholder="Tu nombre" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" (click)="cambiarVista('lista')">Cancelar</button>
+                <button type="submit" class="btn-primary">{{ modoEdicion ? 'Actualizar Registro' : 'Guardar Ordeña'
+                    }}</button>
+            </div>
+        </form>
+    </div>
+
+</div>
