@@ -1,1 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
+/* Importamos la fuente desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+/* Reseteo básico y tipografía global */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc; /* El fondo gris claro de tu dashboard anterior */
+    margin: 0;
+    padding: 0;
+    color: #334155;
+}
+
+/* Ajustes globales para que todos los elementos hereden la fuente */
+h1, h2, h3, h4, h5, h6, p, a, button, input, select {
+    font-family: inherit;
+}

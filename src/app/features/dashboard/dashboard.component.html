@@ -1,0 +1,86 @@
+<div class="calendar-dashboard-wrapper">
+    
+    <header class="dashboard-header">
+        <div class="header-text">
+            <h1>Calendario <span class="text-accent">Granja Lolita</span></h1>
+            <p>Control cronológico de nacimientos, alertas y producción.</p>
+        </div>
+        <div class="header-actions">
+            <select class="filter-select">
+                <option value="all">Todas las anotaciones</option>
+                <option value="nacimientos">Nacimientos</option>
+                <option value="alertas">Alertas Sanitarias</option>
+                <option value="produccion">Producción</option>
+            </select>
+            <button class="btn-primary">
+                <span class="material-symbols-outlined">add</span>
+                Nueva Anotación
+            </button>
+        </div>
+    </header>
+
+    <div class="dashboard-layout">
+        
+        <!-- Calendario Principal -->
+        <div class="main-calendar-card">
+            <div class="calendar-nav-header">
+                <button class="icon-btn" (click)="cambiarMes(-1)">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <h2>{{ nombreMesActual }} {{ anioActual }}</h2>
+                <button class="icon-btn" (click)="cambiarMes(1)">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+            
+            <div class="calendar-grid">
+                <div class="weekday">Dom</div>
+                <div class="weekday">Lun</div>
+                <div class="weekday">Mar</div>
+                <div class="weekday">Mié</div>
+                <div class="weekday">Jue</div>
+                <div class="weekday">Vie</div>
+                <div class="weekday">Sáb</div>
+
+                <div *ngFor="let dia of diasDelMes" 
+                     class="day" 
+                     [ngClass]="{ 'empty': dia.vacio, 'active': dia === diaActivo, 'today-border': dia.esHoy }"
+                     (click)="seleccionarDia(dia)">
+                     
+                    <span *ngIf="!dia.vacio" class="day-number">{{ dia.numero }}</span>
+                    
+                    <ng-container *ngIf="!dia.vacio">
+                        <div *ngFor="let evento of dia.eventos" class="event-badge" [ngClass]="evento.tipo">
+                            {{ evento.titulo }}
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral de Detalles del Día -->
+        <aside class="dashboard-side">
+            <div class="day-details-card" *ngIf="diaActivo">
+                <h3>Agenda del {{ diaActivo.numero }} de {{ nombreMesActual }}</h3>
+                
+                <p *ngIf="diaActivo.eventos.length === 0" class="no-events-text">
+                    No hay anotaciones para este día.
+                </p>
+
+                <div class="annotations-list">
+                    <div *ngFor="let evento of diaActivo.eventos" class="annotation-item" [ngClass]="evento.tipo">
+                        <span class="material-symbols-outlined" *ngIf="evento.tipo === 'nacimiento'">pets</span>
+                        <span class="material-symbols-outlined" *ngIf="evento.tipo === 'alerta'">vaccines</span>
+                        <span class="material-symbols-outlined" *ngIf="evento.tipo === 'produccion'">water_drop</span>
+                        
+                        <div class="annotation-text">
+                            <h4>{{ evento.titulo }}</h4>
+                            <p>{{ evento.descripcion }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+</div>

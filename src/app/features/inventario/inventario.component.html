@@ -1,0 +1,255 @@
+<div class="inventario-wrapper">
+
+    <!-- ================= VISTA 1: TABLA Y FILTROS DE INVENTARIO ================= -->
+    <div *ngIf="vistaActual === 'lista'">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>Inventario de <span class="text-accent">Ganado</span></h1>
+                <p>Gestión completa, trazabilidad y estado físico del hato.</p>
+            </div>
+            <button class="btn-primary" (click)="cambiarVista('formulario')">
+                <span class="material-symbols-outlined">add</span>
+                Registrar Nuevo Bovino
+            </button>
+        </header>
+
+        <!-- Barra de Filtros Actualizada -->
+        <div class="filters-card">
+            <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar por arete SINIIGA o nombre...">
+            </div>
+            <div class="filter-group">
+                <!-- Filtro por Etapa / Edad -->
+                <select [(ngModel)]="filtroEtapa" class="filter-select">
+                    <option value="">Todas las Etapas</option>
+                    <option value="Ternera">Ternera</option>
+                    <option value="Becerra">Becerra</option>
+                    <option value="Productora">Productora (Vaca en Ordeña)</option>
+                    <option value="Seca">Vaca Seca</option>
+                    <option value="Semental">Semental / Reproductor</option>
+                </select>
+
+                <!-- Filtro por Estado -->
+                <select [(ngModel)]="filtroEstado" class="filter-select">
+                    <option value="">Todos los Estados</option>
+                    <option value="Activo">Activo</option>
+                    <option value="En Tratamiento">En Tratamiento</option>
+                    <option value="Vendido">Vendido</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla de Ganado -->
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Arete SINIIGA</th>
+                        <th>Nombre / Alias</th>
+                        <th>Etapa</th>
+                        <th>Género</th>
+                        <th>Lote / Ubicación</th>
+                        <th>Estado</th>
+                        <th>Peso (Kg)</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let animal of animalesFiltrados">
+                        <td><span class="arete">{{ animal.areteSiniiga }}</span></td>
+                        <td><strong>{{ animal.nombreOpcional || 'N/D' }}</strong></td>
+                        <td><span class="etapa-badge">{{ animal.etapaDesarrollo || 'N/D' }}</span></td>
+                        <td>{{ animal.genero }}</td>
+                        <td>{{ animal.loteUbicacion }}</td>
+                        <td>
+                            <span class="status-chip" [ngClass]="{
+                                'active': animal.estado === 'Activo',
+                                'warning': animal.estado === 'En Tratamiento'
+                            }">{{ animal.estado }}</span>
+                        </td>
+                        <td><strong>{{ animal.pesoActualKg }} kg</strong></td>
+                        <td>
+                            <div class="action-buttons-group">
+                                <button class="action-btn" (click)="cambiarVista('detalle', animal)"
+                                    title="Ver Detalle">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                                <button class="action-btn edit" (click)="cambiarVista('formulario', animal)"
+                                    title="Editar Bovino">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="animalesFiltrados.length === 0">
+                        <td colspan="8" class="empty-message">No se encontraron bovinos con los filtros actuales.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- ================= VISTA 2: FORMULARIO DE ALTA / EDICIÓN ================= -->
+    <div *ngIf="vistaActual === 'formulario'" class="form-container-wrapper">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>{{ modoEdicion ? 'Editar' : 'Alta de' }} <span class="text-accent">Bovino</span></h1>
+                <p>{{ modoEdicion ? 'Actualiza los datos del expediente del animal.' : 'Completa la información general
+                    y ubicación del animal.' }}</p>
+            </div>
+            <button class="btn-secondary" (click)="cambiarVista('lista')">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Regresar al Inventario
+            </button>
+        </header>
+
+        <form (ngSubmit)="guardarAnimal()" class="bovine-form">
+            <!-- Sección 1: Datos Generales -->
+            <div class="form-card">
+                <h3>1. Datos Generales de Identificación</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Arete SINIIGA *</label>
+                        <input type="text" [(ngModel)]="nuevoAnimal.areteSiniiga" name="areteSiniiga"
+                            placeholder="Ej. 01 2345 6789" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre o Alias (Opcional)</label>
+                        <input type="text" [(ngModel)]="nuevoAnimal.nombreOpcional" name="nombreOpcional"
+                            placeholder="Ej. La Pinta">
+                    </div>
+                    <div class="form-group">
+                        <label>Raza *</label>
+                        <select [(ngModel)]="nuevoAnimal.raza" name="raza" required>
+                            <option value="Holstein">Holstein</option>
+                            <option value="Suizo">Suizo</option>
+                            <option value="Angus">Angus</option>
+                            <option value="Jersey">Jersey</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Etapa de Desarrollo *</label>
+                        <select [(ngModel)]="nuevoAnimal.etapaDesarrollo" name="etapaDesarrollo" required>
+                            <option value="Ternera">Ternera</option>
+                            <option value="Becerra">Becerra</option>
+                            <option value="Productora">Productora</option>
+                            <option value="Seca">Seca</option>
+                            <option value="Semental">Semental</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Género *</label>
+                        <select [(ngModel)]="nuevoAnimal.genero" name="genero" required>
+                            <option value="Hembra">Hembra</option>
+                            <option value="Macho">Macho</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento *</label>
+                        <input type="date" [(ngModel)]="nuevoAnimal.fechaNacimiento" name="fechaNacimiento" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Peso Actual (Kg) *</label>
+                        <input type="number" [(ngModel)]="nuevoAnimal.pesoActualKg" name="pesoActualKg"
+                            placeholder="Ej. 500" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 2: Ubicación y Lote -->
+            <div class="form-card">
+                <h3>2. Ubicación en Granja y Estado</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Lote / Ubicación Actual *</label>
+                        <input type="text" [(ngModel)]="nuevoAnimal.loteUbicacion" name="loteUbicacion"
+                            placeholder="Ej. Corral de Ordeña A" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado del Animal *</label>
+                        <select [(ngModel)]="nuevoAnimal.estado" name="estado" required>
+                            <option value="Activo">Activo</option>
+                            <option value="En Tratamiento">En Tratamiento</option>
+                            <option value="Vendido">Vendido</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Observaciones o Notas Clínicas</label>
+                        <textarea [(ngModel)]="nuevoAnimal.notas" name="notas" rows="3"
+                            placeholder="Detalles relevantes sobre temperamento, marcas o historiales..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" (click)="cambiarVista('lista')">Cancelar</button>
+                <button type="submit" class="btn-primary">{{ modoEdicion ? 'Actualizar Cambios' : 'Guardar Bovino'
+                    }}</button>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- ================= VISTA 3: DETALLE DEL ANIMAL ================= -->
+    <div *ngIf="vistaActual === 'detalle' && animalSeleccionado" class="detail-container-wrapper">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>Expediente: <span class="text-accent">{{ animalSeleccionado.areteSiniiga }}</span></h1>
+                <p>{{ animalSeleccionado.nombreOpcional ? 'Alias: ' + animalSeleccionado.nombreOpcional : 'Sin alias
+                    registrado' }}</p>
+            </div>
+            <div class="header-actions-group">
+                <button class="btn-primary" (click)="cambiarVista('formulario', animalSeleccionado)">
+                    <span class="material-symbols-outlined">edit</span>
+                    Editar Expediente
+                </button>
+                <button class="btn-secondary" (click)="cambiarVista('lista')">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Regresar
+                </button>
+            </div>
+        </header>
+
+        <div class="detail-grid-layout">
+            <!-- Tarjeta de Información General -->
+            <div class="detail-card">
+                <h3>Información Biográfica</h3>
+                <ul class="detail-list">
+                    <li><span>Raza:</span> <strong>{{ animalSeleccionado.raza }}</strong></li>
+                    <li><span>Etapa:</span> <strong>{{ animalSeleccionado.etapaDesarrollo || 'N/D' }}</strong></li>
+                    <li><span>Género:</span> <strong>{{ animalSeleccionado.genero }}</strong></li>
+                    <li><span>Fecha de Nacimiento:</span> <strong>{{ animalSeleccionado.fechaNacimiento |
+                            date:'longDate' }}</strong></li>
+                    <li><span>Peso Actual:</span> <strong>{{ animalSeleccionado.pesoActualKg }} kg</strong></li>
+                    <li><span>Ubicación:</span> <strong>{{ animalSeleccionado.loteUbicacion }}</strong></li>
+                    <li><span>Estado:</span> <span class="status-chip active">{{ animalSeleccionado.estado }}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tarjeta de Historial Clínico y Producción -->
+            <div class="detail-card-wide">
+                <h3>Historial Clínico y Métricas de Producción</h3>
+                <div class="metrics-preview-box">
+                    <div class="metric-box">
+                        <span class="metric-title">Promedio Ordeña</span>
+                        <span class="metric-value">32.5 L / día</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-title">Última Vacuna</span>
+                        <span class="metric-value">Brucelosis (Ok)</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-title">Árbol Genealógico</span>
+                        <span class="metric-value">Madre registrada</span>
+                    </div>
+                </div>
+                <p class="notes-title">Notas Generales:</p>
+                <p class="notes-content">{{ animalSeleccionado.notas || 'Sin notas registradas para este animal.' }}</p>
+            </div>
+        </div>
+    </div>
+
+</div>
