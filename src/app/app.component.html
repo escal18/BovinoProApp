@@ -1,6 +1,6 @@
-<app-navbar></app-navbar>
+<!-- Solo muestra la barra si está autenticado Y NO está en la vista de login -->
+<app-navbar *ngIf="authService.isAuthenticated() && !isLoginRoute"></app-navbar>
 
-<!-- Aquí abajo se inyectarán las demás pantallas (Dashboard, Inventario, etc.) -->
-<main style="padding: 20px; background-color: #f8fafc; min-height: calc(100vh - 70px);">
+<main [ngClass]="{'content-padding': authService.isAuthenticated() && !isLoginRoute}">
     <router-outlet></router-outlet>
 </main>
