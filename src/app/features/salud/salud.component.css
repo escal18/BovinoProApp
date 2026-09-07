@@ -150,7 +150,6 @@
     font-weight: 800;
     font-size: 0.9rem;
     white-space: nowrap;
-    /* <-- Agrega esta línea para evitar que se rompa en dos renglones */
 }
 
 .status-chip {
@@ -161,19 +160,52 @@
     text-transform: uppercase;
 }
 
-.status-chip.completed {
+.status-chip.vacuna {
     background: #dcfce7;
     color: #166534;
 }
 
-.status-chip.warning {
+.status-chip.desparasitante {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.status-chip.enfermedad {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-chip.revision {
     background: #fef3c7;
     color: #92400e;
 }
 
-.status-chip.pending {
-    background: #e0e7ff;
-    color: #3730a3;
+/* Colores de estados para el directorio de expedientes */
+.status-chip.active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-chip.warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-chip.sold {
+    background-color: #e2e8f0;
+    color: #475569;
+}
+
+.status-chip.danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* Para que los aretes en la alerta se vean como botones clicables */
+.badge-animal:hover {
+    background-color: #fcd34d;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
 }
 
 .empty-message {
@@ -260,26 +292,6 @@
     }
 }
 
-.status-chip.vacuna {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.status-chip.desparasitante {
-    background: #e0e7ff;
-    color: #3730a3;
-}
-
-.status-chip.enfermedad {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.status-chip.revision {
-    background: #fef3c7;
-    color: #92400e;
-}
-
 .animal-cell {
     display: flex;
     flex-direction: column;
@@ -291,4 +303,122 @@
     font-size: 0.85rem;
     font-weight: 700;
     color: #475569;
+}
+
+/* ================= NUEVOS ESTILOS ================= */
+
+/* Tarjeta de Alerta de Tratamiento */
+.alert-tratamiento-card {
+    display: flex;
+    gap: 15px;
+    background-color: #fffbeb;
+    border-left: 6px solid #f59e0b;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.alert-icon span {
+    color: #f59e0b;
+    font-size: 2rem;
+}
+
+.alert-content h3 {
+    margin: 0 0 5px 0;
+    color: #92400e;
+    font-size: 1.1rem;
+}
+
+.alert-content p {
+    margin: 0 0 10px 0;
+    color: #b45309;
+    font-size: 0.95rem;
+}
+
+.alert-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.badge-animal {
+    background-color: #fde68a;
+    color: #92400e;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* Selector e inputs de solo lectura */
+.highlight-select {
+    border: 2px solid #3b82f6 !important;
+    background-color: #eff6ff !important;
+}
+
+.readonly-input {
+    background-color: #e2e8f0 !important;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+/* Filtros Radio Buttons en Formulario */
+.radio-group {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 5px 0 10px 0;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* Efecto cuando marcas al animal como recuperado (Activo) */
+.status-changed {
+    background-color: #dcfce7 !important;
+    border-color: #22c55e !important;
+    color: #166534 !important;
+    font-weight: 800 !important;
+}
+
+/* Botones de acción en la tabla */
+.action-buttons-group {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: #f1f5f9;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.action-btn.edit {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.action-btn.edit:hover {
+    background: #fde68a;
+    color: #b45309;
 }

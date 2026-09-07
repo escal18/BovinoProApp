@@ -36,6 +36,7 @@
                     <option value="Activo">Activo</option>
                     <option value="En Tratamiento">En Tratamiento</option>
                     <option value="Vendido">Vendido</option>
+                    <option value="Fallecido">Fallecido</option>
                 </select>
             </div>
         </div>
@@ -65,8 +66,10 @@
                         <td>
                             <span class="status-chip" [ngClass]="{
                                 'active': animal.estado === 'Activo',
-                                'warning': animal.estado === 'En Tratamiento'
-                            }">{{ animal.estado }}</span>
+                                'warning': animal.estado === 'En Tratamiento',
+                                'sold': animal.estado === 'Vendido',
+                                'danger': animal.estado === 'Fallecido'
+                            }">{{ animal.estado | uppercase }}</span>
                         </td>
                         <td><strong>{{ animal.pesoActualKg }} kg</strong></td>
                         <td>
@@ -173,6 +176,8 @@
                             <option value="Activo">Activo</option>
                             <option value="En Tratamiento">En Tratamiento</option>
                             <option value="Vendido">Vendido</option>
+                            <!-- Solo mostramos Fallecido si estamos editando un registro existente -->
+                            <option *ngIf="modoEdicion" value="Fallecido">Fallecido</option>
                         </select>
                     </div>
                     <div class="form-group full-width">
@@ -224,7 +229,14 @@
                             date:'longDate' }}</strong></li>
                     <li><span>Peso Actual:</span> <strong>{{ animalSeleccionado.pesoActualKg }} kg</strong></li>
                     <li><span>Ubicación:</span> <strong>{{ animalSeleccionado.loteUbicacion }}</strong></li>
-                    <li><span>Estado:</span> <span class="status-chip active">{{ animalSeleccionado.estado }}</span>
+                    <li>
+                        <span>Estado:</span>
+                        <span class="status-chip" [ngClass]="{
+                            'active': animalSeleccionado.estado === 'Activo',
+                            'warning': animalSeleccionado.estado === 'En Tratamiento',
+                            'sold': animalSeleccionado.estado === 'Vendido',
+                            'danger': animalSeleccionado.estado === 'Fallecido'
+                        }">{{ animalSeleccionado.estado | uppercase }}</span>
                     </li>
                 </ul>
             </div>

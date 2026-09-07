@@ -1,58 +1,113 @@
 <div class="salud-wrapper">
 
-    <!-- ================= VISTA 1: TABLA Y FILTROS DE SALUD ================= -->
+    <!-- ================= VISTA 1: DIRECTORIO DE EXPEDIENTES (LISTA) ================= -->
     <div *ngIf="vistaActual === 'lista'">
         <header class="section-header">
             <div class="header-text">
-                <h1>Control de <span class="text-accent">Salud e Higiene</span></h1>
-                <p>Registro de vacunas, desparasitaciones, enfermedades y revisiones.</p>
+                <h1>Expedientes <span class="text-accent">Clínicos</span></h1>
+                <p>Directorio médico del hato. Selecciona un animal para ver o modificar su historial.</p>
             </div>
-            <button class="btn-primary" (click)="cambiarVista('formulario')">
-                <span class="material-symbols-outlined">add</span>
-                Registrar Evento Clínico
-            </button>
         </header>
 
-        <!-- Barra de Filtros -->
-        <div class="filters-card">
-            <div class="search-box">
-                <span class="material-symbols-outlined">search</span>
-                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar por arete, nombre o tratamiento...">
+        <!-- ALERTA RESTAURADA -->
+        <div class="alert-tratamiento-card" *ngIf="animalesEnTratamiento.length > 0">
+            <div class="alert-icon">
+                <span class="material-symbols-outlined">warning</span>
             </div>
-            <div class="filter-group">
-                <select [(ngModel)]="filtroTipo" class="filter-select">
-                    <option value="">Todos los Tipos</option>
-                    <option value="Vacuna">Vacuna</option>
-                    <option value="Desparasitante">Desparasitante</option>
-                    <option value="Enfermedad">Enfermedad</option>
-                    <option value="Revisión Rutina">Revisión Rutina</option>
-                </select>
+            <div class="alert-content">
+                <h3>Atención: {{ animalesEnTratamiento.length }} animal(es) en tratamiento activo</h3>
+                <p>Haz clic en el botón "Ver Expediente" de los siguientes bovinos para dar seguimiento:</p>
+                <div class="alert-badges">
+                    <span class="badge-animal" *ngFor="let animal of animalesEnTratamiento" style="cursor: pointer;" (click)="abrirExpediente(animal)">
+                        Arete: {{ animal.areteSiniiga }} {{ animal.nombreOpcional ? '(' + animal.nombreOpcional + ')' : '' }}
+                    </span>
+                </div>
             </div>
         </div>
 
-        <!-- Tabla de Eventos Sanitarios -->
+        <div class="filters-card">
+            <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar expediente por arete o nombre...">
+            </div>
+        </div>
+
         <div class="table-card">
             <table class="custom-table">
                 <thead>
                     <tr>
-                        <th>Animal / Arete</th>
-                        <th>Tipo</th>
-                        <th>Fecha</th>
-                        <th>Diagnóstico</th>
-                        <th>Tratamiento Aplicado</th>
-                        <th>Dosis</th>
-                        <th>Próxima Revisión</th>
-                        <th>Veterinario</th>
+                        <th>Arete SINIIGA</th>
+                        <th>Nombre / Alias</th>
+                        <th>Etapa</th>
+                        <th>Lote / Ubicación</th>
+                        <th>Estado Actual</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let evento of eventosFiltrados">
+                    <tr *ngFor="let animal of expedientesFiltrados">
+                        <td><span class="arete">{{ animal.areteSiniiga }}</span></td>
+                        <td><strong>{{ animal.nombreOpcional || 'N/D' }}</strong></td>
+                        <td>{{ animal.etapaDesarrollo || 'N/D' }}</td>
+                        <td>{{ animal.loteUbicacion }}</td>
                         <td>
-                            <div class="animal-cell">
-                                <span class="arete">{{ evento.animalId }}</span>
-                                <span class="nombre-alias">{{ evento.nombreAnimal || 'Sin alias' }}</span>
-                            </div>
+                            <span class="status-chip" [ngClass]="{
+                                'active': animal.estado === 'Activo',
+                                'warning': animal.estado === 'En Tratamiento',
+                                'sold': animal.estado === 'Vendido',
+                                'danger': animal.estado === 'Fallecido'
+                            }">{{ animal.estado | uppercase }}</span>
                         </td>
+                        <td>
+                            <button class="btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" (click)="abrirExpediente(animal)">
+                                <span class="material-symbols-outlined" style="font-size: 1.1rem;">folder_open</span>
+                                Ver Expediente
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="expedientesFiltrados.length === 0">
+                        <td colspan="6" class="empty-message">No se encontraron expedientes con esa búsqueda.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- ================= VISTA 2: DETALLE DEL EXPEDIENTE ================= -->
+    <div *ngIf="vistaActual === 'expediente' && animalSeleccionadoExpediente" class="form-container-wrapper">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>Expediente de <span class="text-accent">{{ animalSeleccionadoExpediente.areteSiniiga }}</span></h1>
+                <p>Alias: {{ animalSeleccionadoExpediente.nombreOpcional || 'N/D' }} | Estado: <strong [ngClass]="{'text-accent': animalSeleccionadoExpediente.estado === 'Activo', 'text-warning': animalSeleccionadoExpediente.estado === 'En Tratamiento'}" style="color: #d97706;">{{ animalSeleccionadoExpediente.estado }}</strong></p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-secondary" (click)="irALista()">
+                    <span class="material-symbols-outlined">arrow_back</span> Regresar
+                </button>
+                <button class="btn-primary" (click)="nuevoEventoDesdeExpediente()">
+                    <span class="material-symbols-outlined">add</span> Nuevo Registro
+                </button>
+            </div>
+        </header>
+
+        <div class="table-card">
+            <h3 style="margin-top: 0; color: #0f172a; margin-bottom: 15px;">Historial Clínico</h3>
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Diagnóstico</th>
+                        <th>Tratamiento</th>
+                        <th>Dosis</th>
+                        <th>Próxima Rev.</th>
+                        <th>Veterinario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let evento of eventosDelExpediente">
                         <td>
                             <span class="status-chip" [ngClass]="{
                                 'vacuna': evento.tipo === 'Vacuna',
@@ -61,16 +116,20 @@
                                 'revision': evento.tipo === 'Revisión Rutina'
                             }">{{ evento.tipo }}</span>
                         </td>
-                        <td>{{ evento.fecha | date:'shortDate' }}</td>
+                        <td>{{ evento.fecha }}</td>
                         <td>{{ evento.diagnostico || 'N/D' }}</td>
                         <td><strong>{{ evento.tratamientoAplicado }}</strong></td>
                         <td>{{ evento.dosis || 'N/D' }}</td>
-                        <td>{{ evento.proximaRevision ? (evento.proximaRevision | date:'shortDate') : 'N/A' }}</td>
+                        <td>{{ evento.proximaRevision || 'N/A' }}</td>
                         <td>{{ evento.veterinarioEncargado }}</td>
+                        <td>
+                            <button class="action-btn edit" (click)="editarEvento(evento)" title="Editar">
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
+                        </td>
                     </tr>
-                    <tr *ngIf="eventosFiltrados.length === 0">
-                        <td colspan="8" class="empty-message">No se encontraron registros clínicos con los filtros
-                            actuales.</td>
+                    <tr *ngIf="eventosDelExpediente.length === 0">
+                        <td colspan="8" class="empty-message">No hay registros clínicos en el expediente de esta vaca.</td>
                     </tr>
                 </tbody>
             </table>
@@ -78,33 +137,23 @@
     </div>
 
 
-    <!-- ================= VISTA 2: FORMULARIO DE NUEVO EVENTO ================= -->
+    <!-- ================= VISTA 3: FORMULARIO (NUEVO / EDITAR) ================= -->
     <div *ngIf="vistaActual === 'formulario'" class="form-container-wrapper">
         <header class="section-header">
             <div class="header-text">
-                <h1>Nuevo <span class="text-accent">Registro Clínico</span></h1>
-                <p>Anota los detalles de la aplicación médica o revisión del animal.</p>
+                <h1>{{ modoEdicion ? 'Editar' : 'Agregar a' }} <span class="text-accent">Expediente</span></h1>
+                <p>Paciente: {{ animalSeleccionadoExpediente?.areteSiniiga }} ({{ animalSeleccionadoExpediente?.nombreOpcional || 'Sin alias' }})</p>
             </div>
-            <button class="btn-secondary" (click)="cambiarVista('lista')">
-                <span class="material-symbols-outlined">arrow_back</span>
-                Regresar al Historial
+            <button class="btn-secondary" (click)="vistaActual = 'expediente'">
+                <span class="material-symbols-outlined">close</span> Cancelar
             </button>
         </header>
 
         <form (ngSubmit)="guardarEventoSalud()" class="bovine-form">
             <div class="form-card">
-                <h3>Detalles del Expediente Clínico</h3>
+                <h3>Detalles de la Aplicación Médica</h3>
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>Arete SINIIGA (Animal ID) *</label>
-                        <input type="text" [(ngModel)]="nuevoEvento.animalId" name="animalId"
-                            placeholder="Ej. 01 2345 6789" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nombre o Alias (Opcional)</label>
-                        <input type="text" [(ngModel)]="nuevoEvento.nombreAnimal" name="nombreAnimal"
-                            placeholder="Ej. La Pinta">
-                    </div>
+                    
                     <div class="form-group">
                         <label>Tipo de Evento *</label>
                         <select [(ngModel)]="nuevoEvento.tipo" name="tipo" required>
@@ -118,20 +167,19 @@
                         <label>Fecha de Aplicación *</label>
                         <input type="date" [(ngModel)]="nuevoEvento.fecha" name="fecha" required>
                     </div>
-                    <div class="form-group">
-                        <label>Dosis *</label>
-                        <input type="text" [(ngModel)]="nuevoEvento.dosis" name="dosis" placeholder="Ej. 10 ml / 5 cc"
-                            required>
-                    </div>
                     <div class="form-group full-width">
+                        <label>Diagnóstico (Asunto Clínico) *</label>
+                        <textarea [(ngModel)]="nuevoEvento.diagnostico" name="diagnostico" rows="2"
+                            placeholder="Ej. Fiebre alta..." required></textarea>
+                    </div>
+                    <div class="form-group">
                         <label>Tratamiento Aplicado / Producto *</label>
                         <input type="text" [(ngModel)]="nuevoEvento.tratamientoAplicado" name="tratamientoAplicado"
-                            placeholder="Ej. Oxitetraciclina / Ivermectina" required>
+                            placeholder="Ej. Oxitetraciclina" required>
                     </div>
-                    <div class="form-group full-width">
-                        <label>Diagnóstico (Opcional)</label>
-                        <textarea [(ngModel)]="nuevoEvento.diagnostico" name="diagnostico" rows="2"
-                            placeholder="Motivo de la consulta o hallazgo clínico..."></textarea>
+                    <div class="form-group">
+                        <label>Dosis *</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.dosis" name="dosis" placeholder="Ej. 10 ml" required>
                     </div>
                     <div class="form-group">
                         <label>Próxima Revisión / Refuerzo (Opcional)</label>
@@ -139,17 +187,28 @@
                     </div>
                     <div class="form-group">
                         <label>Veterinario Encargado *</label>
-                        <input type="text" [(ngModel)]="nuevoEvento.veterinarioEncargado" name="veterinarioEncargado"
-                            placeholder="Ej. Dr. Roberto Gómez" required>
+                        <input type="text" [(ngModel)]="nuevoEvento.veterinarioEncargado" name="veterinarioEncargado" required>
                     </div>
+
+                    <div class="form-group full-width">
+                        <label>Actualizar Estado del Animal (Opcional)</label>
+                        <select [(ngModel)]="estadoActualizado" name="estadoActualizado" required
+                                [ngClass]="{'status-changed': estadoActualizado === 'Activo'}">
+                            <option value="Activo">Recuperado / Activo Sano</option>
+                            <option value="En Tratamiento">Sigue en Tratamiento</option>
+                            <option value="Fallecido">Fallecido</option>
+                        </select>
+                        <small style="color: #64748b; margin-top: 5px;">*El estado se actualizará en su ficha general de Inventario.</small>
+                    </div>
+
                 </div>
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn-secondary" (click)="cambiarVista('lista')">Cancelar</button>
-                <button type="submit" class="btn-primary">Guardar Expediente Clínico</button>
+                <button type="submit" class="btn-primary">
+                    {{ modoEdicion ? 'Actualizar Evento' : 'Guardar en Expediente' }}
+                </button>
             </div>
         </form>
     </div>
-
 </div>
