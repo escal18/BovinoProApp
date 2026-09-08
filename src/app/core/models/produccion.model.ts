@@ -1,16 +1,14 @@
-export type TurnoOrdena = 'Mañana' | 'Tarde';
 export type TipoRegistro = 'Individual' | 'Tanque General';
 
 export interface RegistroProduccion {
-    id: string;
+    id?: string;
     tipoRegistro: TipoRegistro;
     animalId?: string;
     loteGrupo?: string;
-    fecha: Date;
-    turno: TurnoOrdena;
+    fecha: string;
     litrosProducidos: number;
-    litrosVendidos?: number; // <-- Nuevo: Litros entregados/vendidos para comparar
-    diferencia?: number;     // <-- Nuevo: Diferencia calculada (Producidos vs Vendidos)
+    litrosVendidos?: number; 
+    diferencia?: number;     
     calidadLeche?: string;
     registradoPor: string;
 }

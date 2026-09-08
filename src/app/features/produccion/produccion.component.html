@@ -5,29 +5,45 @@
         <header class="section-header">
             <div class="header-text">
                 <h1>Control y <span class="text-accent">Corte de Producción</span></h1>
-                <p>Acumulado semanal, control de tanque y auditoría frente a ventas.</p>
+                <p>Acumulado diario, control de tanque y auditoría frente a ventas.</p>
             </div>
             <button class="btn-primary" (click)="cambiarVista('formulario')">
                 <span class="material-symbols-outlined">add</span>
-                Registrar Ordeña
+                Registrar Día de Producción
             </button>
         </header>
 
-        <!-- Tarjetas de Resumen -->
+        <!-- Tarjetas de Resumen FIJAS (Solo Semana Actual) -->
         <div class="metrics-grid">
             <div class="metric-card highlight">
-                <span class="metric-label">Acumulado de la Semana</span>
-                <span class="metric-value">{{ totalLitrosSemana }} <small>Litros</small></span>
-                <span class="metric-subtext">Se reinicia cada domingo</span>
+                <span class="metric-label">Tanque General (Semana)</span>
+                <span class="metric-value">{{ metricasSemanaActual.producido | number:'1.1-2' }} <small>L</small></span>
+                <span class="metric-subtext">Leche apta para venta</span>
             </div>
-            <div class="metric-card" [ngClass]="{'warning-border': diferenciaTotalSemana !== 0}">
-                <span class="metric-label">Diferencia Total (Producido vs Vendido)</span>
+
+            <div class="metric-card" style="border-left: 5px solid #10b981;">
+                <span class="metric-label">Vendido (Semana)</span>
+                <span class="metric-value">{{ metricasSemanaActual.vendido | number:'1.1-2' }} <small>L</small></span>
+                <span class="metric-subtext">Ventas registradas del tanque</span>
+            </div>
+
+            <div class="metric-card" [ngClass]="{'warning-border': metricasSemanaActual.diferencia !== 0}">
+                <span class="metric-label">Diferencia (Mermas/Sobrantes)</span>
                 <span class="metric-value"
-                    [ngStyle]="{'color': diferenciaTotalSemana < 0 ? '#dc2626' : (diferenciaTotalSemana > 0 ? '#16a34a' : '#0f172a')}">
-                    {{ diferenciaTotalSemana > 0 ? '+' + diferenciaTotalSemana : diferenciaTotalSemana }}
+                    [ngStyle]="{'color': metricasSemanaActual.diferencia < 0 ? '#dc2626' : (metricasSemanaActual.diferencia > 0 ? '#16a34a' : '#0f172a')}">
+                    {{ metricasSemanaActual.diferencia > 0 ? '+' + (metricasSemanaActual.diferencia | number:'1.1-2') :
+                    (metricasSemanaActual.diferencia | number:'1.1-2') }}
                     <small>L</small>
                 </span>
-                <span class="metric-subtext">Balance de mermas / sobrantes</span>
+                <span class="metric-subtext">Producido vs Vendido</span>
+            </div>
+
+            <!-- NUEVA TARJETA: LECHE SEPARADA -->
+            <div class="metric-card" style="border-left: 5px solid #f59e0b; background-color: #fffbeb;">
+                <span class="metric-label" style="color: #b45309;">Leche Separada (Individual)</span>
+                <span class="metric-value" style="color: #92400e;">{{ metricasSemanaActual.lecheSeparada |
+                    number:'1.1-2' }} <small>L</small></span>
+                <span class="metric-subtext" style="color: #b45309;">Vacas en tratamiento / calostro</span>
             </div>
         </div>
 
@@ -37,83 +53,123 @@
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar por tanque, arete o responsable...">
             </div>
-            <div class="filter-group">
-                <select [(ngModel)]="filtroTurno" class="filter-select">
-                    <option value="">Ambos Turnos</option>
-                    <option value="Mañana">Mañana</option>
-                    <option value="Tarde">Tarde</option>
+
+            <div class="filter-group" style="display: flex; align-items: center; gap: 15px;">
+                <!-- CONTENEDOR DE CALENDARIO MEJORADO -->
+                <div class="date-filter-wrapper">
+                    <span class="material-symbols-outlined date-icon">calendar_month</span>
+                    <input type="date" [(ngModel)]="filtroFecha" title="Buscar por fecha exacta">
+
+                    <button *ngIf="filtroFecha" (click)="filtroFecha = ''" class="clear-date-btn" title="Borrar fecha">
+                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">close</span>
+                    </button>
+                </div>
+
+                <select [(ngModel)]="filtroPeriodo" class="filter-select">
+                    <option value="semana">Mostrar Solo Esta Semana</option>
+                    <option value="todos">Mostrar Histórico Completo</option>
                 </select>
             </div>
         </div>
 
-        <!-- Tabla -->
-        <div class="table-card">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Destino / Tanque</th>
-                        <th>Fecha</th>
-                        <th>Turno</th>
-                        <th>Producidos</th>
-                        <th>Vendidos</th>
-                        <th>Diferencia</th>
-                        <th>Calidad</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let reg of registrosFiltrados">
-                        <td>
-                            <div class="animal-cell">
-                                <span class="arete">{{ reg.tipoRegistro === 'Tanque General' ? (reg.loteGrupo || 'Tanque
-                                    General') : reg.animalId }}</span>
-                                <span class="nombre-alias">{{ reg.tipoRegistro }}</span>
-                            </div>
-                        </td>
-                        <td>{{ reg.fecha | date:'shortDate' }}</td>
-                        <td>
-                            <span class="status-chip" [ngClass]="{
-                                'matutina': reg.turno === 'Mañana',
-                                'vespertina': reg.turno === 'Tarde'
-                            }">{{ reg.turno }}</span>
-                        </td>
-                        <td><strong>{{ reg.litrosProducidos }} L</strong></td>
-                        <td>{{ reg.litrosVendidos !== undefined ? reg.litrosVendidos + ' L' : 'Pendiente venta' }}</td>
-                        <td>
-                            <span *ngIf="reg.diferencia !== undefined" class="diff-badge" [ngClass]="{
-                                'neutral': reg.diferencia === 0,
-                                'positive': reg.diferencia > 0,
-                                'negative': reg.diferencia < 0
-                            }">
-                                {{ reg.diferencia > 0 ? '+' + reg.diferencia : reg.diferencia }} L
-                            </span>
-                            <span *ngIf="reg.diferencia === undefined" class="pending-text">Sin auditar</span>
-                        </td>
-                        <td>{{ reg.calidadLeche || 'N/D' }}</td>
-                        <td>
-                            <button class="action-btn edit" (click)="cambiarVista('formulario', reg)"
-                                title="Registrar Venta / Editar">
-                                <span class="material-symbols-outlined">edit</span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr *ngIf="registrosFiltrados.length === 0">
-                        <td colspan="8" class="empty-message">No se encontraron registros con los filtros actuales.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- CARPETAS POR SEMANA -->
+        <div *ngIf="produccionAgrupada.length === 0" class="empty-message table-card">
+            No se encontraron registros de producción para el periodo seleccionado.
+        </div>
+
+        <div class="folder-card" *ngFor="let carpeta of produccionAgrupada">
+            <!-- Encabezado de la Carpeta -->
+            <div class="folder-header">
+                <h3>
+                    <span class="material-symbols-outlined" style="color:#64748b;">folder_open</span>
+                    {{ carpeta.titulo }}
+                    <span *ngIf="carpeta.esSemanaActual" class="badge-current">Semana en Curso</span>
+                </h3>
+                <div class="folder-stats">
+                    <span title="Tanque Producido">
+                        <span class="material-symbols-outlined"
+                            style="font-size: 1.1rem; color: #3b82f6;">water_drop</span>
+                        <strong>{{ carpeta.totalProducido | number:'1.1-2' }} L</strong>
+                    </span>
+                    <span title="Total Vendido">
+                        <span class="material-symbols-outlined"
+                            style="font-size: 1.1rem; color: #10b981;">local_shipping</span>
+                        <strong>{{ carpeta.totalVendido | number:'1.1-2' }} L</strong>
+                    </span>
+                    <span title="Diferencia"
+                        [ngStyle]="{'color': carpeta.diferencia < 0 ? '#dc2626' : (carpeta.diferencia > 0 ? '#16a34a' : '#475569')}">
+                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">balance</span>
+                        <strong>{{ carpeta.diferencia > 0 ? '+' : '' }}{{ carpeta.diferencia | number:'1.1-2' }}
+                            L</strong>
+                    </span>
+                    <!-- Etiqueta de Leche Separada (Solo si hay) -->
+                    <span *ngIf="carpeta.totalSeparada > 0" title="Leche Separada"
+                        style="background-color: #fef3c7; border-color: #fde68a; color: #b45309;">
+                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">vaccines</span>
+                        <strong>{{ carpeta.totalSeparada | number:'1.1-2' }} L</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabla interna de la Carpeta -->
+            <div class="table-container" style="overflow-x: auto;">
+                <table class="custom-table" style="margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th>Destino / Tanque</th>
+                            <th>Fecha</th>
+                            <th>Producido</th>
+                            <th>Vendido</th>
+                            <th>Diferencia</th>
+                            <th>Calidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let reg of carpeta.registros">
+                            <td>
+                                <div class="animal-cell">
+                                    <span class="arete">{{ reg.tipoRegistro === 'Tanque General' ? (reg.loteGrupo ||
+                                        'Tanque General') : reg.animalId }}</span>
+                                    <span class="nombre-alias">{{ reg.tipoRegistro }}</span>
+                                </div>
+                            </td>
+                            <td>{{ reg.fecha | date:'mediumDate' }}</td>
+                            <td><strong>{{ reg.litrosProducidos }} L</strong></td>
+                            <td>{{ reg.litrosVendidos !== undefined ? reg.litrosVendidos + ' L' : 'Pendiente' }}</td>
+                            <td>
+                                <span *ngIf="reg.diferencia !== undefined" class="diff-badge" [ngClass]="{
+                                    'neutral': reg.diferencia === 0,
+                                    'positive': reg.diferencia > 0,
+                                    'negative': reg.diferencia < 0
+                                }">
+                                    {{ reg.diferencia > 0 ? '+' + reg.diferencia : reg.diferencia }} L
+                                </span>
+                                <span *ngIf="reg.diferencia === undefined" class="pending-text">Sin auditar</span>
+                            </td>
+                            <td>{{ reg.calidadLeche || 'N/D' }}</td>
+                            <td>
+                                <button class="action-btn edit" (click)="cambiarVista('formulario', reg)"
+                                    title="Editar">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
 
-    <!-- ================= VISTA 2: FORMULARIO (ALTA / EDICIÓN) ================= -->
+    <!-- ================= VISTA 2: FORMULARIO ================= -->
     <div *ngIf="vistaActual === 'formulario'" class="form-container-wrapper">
         <header class="section-header">
             <div class="header-text">
-                <h1>{{ modoEdicion ? 'Actualizar Ordeña o' : 'Nuevo' }} <span class="text-accent">Registro de
-                        Venta</span></h1>
-                <p>{{ modoEdicion ? 'Agrega o ajusta los litros vendidos para completar la auditoría.' : 'Registra
-                    primero los litros del tanque y complementa después con la venta.' }}</p>
+                <h1>{{ modoEdicion ? 'Actualizar Producción o' : 'Nuevo' }} <span class="text-accent">Registro
+                        Diario</span></h1>
+                <p>{{ modoEdicion ? 'Agrega o ajusta los litros vendidos para completar la auditoría.' : 'Registra el
+                    acumulado de leche de todo el día.' }}</p>
             </div>
             <button class="btn-secondary" (click)="cambiarVista('lista')">
                 <span class="material-symbols-outlined">arrow_back</span>
@@ -123,20 +179,26 @@
 
         <form (ngSubmit)="guardarProduccion()" class="bovine-form">
             <div class="form-card">
-                <h3>Detalles de Producción y Auditoría de Venta</h3>
+                <h3>Detalles de Producción Diaria y Auditoría de Venta</h3>
                 <div class="form-grid">
+
                     <div class="form-group">
                         <label>Tipo de Registro *</label>
-                        <select [(ngModel)]="nuevoRegistro.tipoRegistro" name="tipoRegistro" required>
+                        <select [(ngModel)]="nuevoRegistro.tipoRegistro" name="tipoRegistro" required
+                            [disabled]="modoEdicion">
                             <option value="Tanque General">Tanque General</option>
                             <option value="Individual">Individual (Vaca específica)</option>
                         </select>
                     </div>
 
                     <div class="form-group" *ngIf="nuevoRegistro.tipoRegistro === 'Individual'">
-                        <label>Arete SINIIGA / Nombre *</label>
-                        <input type="text" [(ngModel)]="nuevoRegistro.animalId" name="animalId"
-                            placeholder="Ej. 01 2345 6789 (La Pinta)">
+                        <label>Seleccionar Vaca Productora *</label>
+                        <select [(ngModel)]="nuevoRegistro.animalId" name="animalId" required>
+                            <option [ngValue]="undefined" disabled>-- Selecciona un Arete --</option>
+                            <option *ngFor="let vaca of vacasProductoras" [value]="vaca.areteSiniiga">
+                                {{ vaca.areteSiniiga }} {{ vaca.nombreOpcional ? '(' + vaca.nombreOpcional + ')' : '' }}
+                            </option>
+                        </select>
                     </div>
 
                     <div class="form-group" *ngIf="nuevoRegistro.tipoRegistro === 'Tanque General'">
@@ -146,31 +208,28 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Fecha *</label>
+                        <label>Fecha del Registro *</label>
                         <input type="date" [(ngModel)]="nuevoRegistro.fecha" name="fecha" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Turno *</label>
-                        <select [(ngModel)]="nuevoRegistro.turno" name="turno" required>
-                            <option value="Mañana">Mañana</option>
-                            <option value="Tarde">Tarde</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Litros Producidos (Báscula / Tanque) *</label>
+                        <label>Total de Litros Producidos en el Día *</label>
                         <input type="number" step="0.1" [(ngModel)]="nuevoRegistro.litrosProducidos"
                             name="litrosProducidos" placeholder="Ej. 345.0" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Litros Vendidos / Entregados (Auditoría)</label>
+                        <label>Total de Litros Vendidos (Auditoría)</label>
                         <input type="number" step="0.1" [(ngModel)]="nuevoRegistro.litrosVendidos" name="litrosVendidos"
                             placeholder="Ej. 347.0 (Llenar al vender)">
                     </div>
+
                     <div class="form-group">
                         <label>Calidad de Leche</label>
                         <input type="text" [(ngModel)]="nuevoRegistro.calidadLeche" name="calidadLeche"
                             placeholder="Ej. Excelente">
                     </div>
+
                     <div class="form-group">
                         <label>Registrado Por *</label>
                         <input type="text" [(ngModel)]="nuevoRegistro.registradoPor" name="registradoPor"
@@ -181,10 +240,9 @@
 
             <div class="form-actions">
                 <button type="button" class="btn-secondary" (click)="cambiarVista('lista')">Cancelar</button>
-                <button type="submit" class="btn-primary">{{ modoEdicion ? 'Actualizar Registro' : 'Guardar Ordeña'
-                    }}</button>
+                <button type="submit" class="btn-primary">{{ modoEdicion ? 'Actualizar Registro' : 'Guardar Total del
+                    Día' }}</button>
             </div>
         </form>
     </div>
-
 </div>

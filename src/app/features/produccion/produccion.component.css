@@ -362,3 +362,132 @@
     font-style: italic;
     font-weight: 600;
 }
+
+/* ================= ESTILOS PARA LAS CARPETAS SEMANALES ================= */
+.folder-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 25px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.folder-header {
+    background: #f8fafc;
+    padding: 15px 25px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.folder-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+}
+
+.badge-current {
+    background: #3b82f6;
+    color: white;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.folder-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+.folder-stats span {
+    background: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ================= CALENDARIO DE BÚSQUEDA MEJORADO ================= */
+
+.date-filter-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 0 8px 0 15px; /* Espacio ajustado para el botón */
+    transition: all 0.2s ease;
+    height: 42px; /* Misma altura que el input de búsqueda y el select */
+}
+
+.date-filter-wrapper:focus-within {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.date-icon {
+    color: #64748b;
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+.date-filter-wrapper input[type="date"] {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    /* Ajuste para que ocupe el espacio sin empujar */
+    padding: 0;
+}
+
+/* Personalizar sutilmente la flecha/icono del navegador webkit (Chrome/Edge) */
+.date-filter-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s ease;
+}
+
+.date-filter-wrapper input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Botón rojo integrado para limpiar la fecha */
+.clear-date-btn {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 8px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.clear-date-btn:hover {
+    background: #fca5a5;
+    transform: scale(1.05);
+}
