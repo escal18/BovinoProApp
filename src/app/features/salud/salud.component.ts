@@ -55,12 +55,26 @@ export class SaludComponent implements OnInit {
     });
   }
 
-  // Filtra los animales en la pantalla principal (Directorio)
+// Filtra y ORDENA los animales en la pantalla principal (Directorio)
   get expedientesFiltrados() {
-    return this.animalesInventario.filter(animal => {
+    const ordenEtapas: { [key: string]: number } = {
+      'Ternera': 1,
+      'Becerra': 2,
+      'Productora': 3,
+      'Seca': 4,
+      'Semental': 5
+    };
+
+    let filtrados = this.animalesInventario.filter(animal => {
       const coincideBusqueda = animal.areteSiniiga?.toLowerCase().includes(this.filtroBusqueda.toLowerCase()) ||
                                (animal.nombreOpcional && animal.nombreOpcional.toLowerCase().includes(this.filtroBusqueda.toLowerCase()));
       return coincideBusqueda;
+    });
+
+    return filtrados.sort((a, b) => {
+      const etapaA = ordenEtapas[a.etapaDesarrollo || ''] || 99;
+      const etapaB = ordenEtapas[b.etapaDesarrollo || ''] || 99;
+      return etapaA - etapaB;
     });
   }
 

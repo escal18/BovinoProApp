@@ -1,71 +1,62 @@
 <div class="reproduccion-wrapper">
-    
-    <!-- ================= VISTA 1: TABLA Y FILTros ================= -->
+
+    <!-- ================= VISTA 1: DIRECTORIO DE HEMBRAS (LISTA) ================= -->
     <div *ngIf="vistaActual === 'lista'">
         <header class="section-header">
             <div class="header-text">
                 <h1>Control de <span class="text-accent">Reproducción y Gestación</span></h1>
-                <p>Seguimiento de servicios, diagnósticos de preñez y fechas probables de parto.</p>
+                <p>Directorio de vientres del hato. Selecciona una hembra para ver su historial reproductivo.</p>
             </div>
-            <button class="btn-primary" (click)="cambiarVista('formulario')">
-                <span class="material-symbols-outlined">add</span>
-                Registrar Servicio / Evento
-            </button>
         </header>
 
         <!-- Barra de Filtros -->
         <div class="filters-card">
             <div class="search-box">
                 <span class="material-symbols-outlined">search</span>
-                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar por arete, nombre o semental...">
-            </div>
-            <div class="filter-group">
-                <select [(ngModel)]="filtroEstado" class="filter-select">
-                    <option value="">Todos los Estados</option>
-                    <option value="Preñada">Preñada</option>
-                    <option value="Inseminada">Inseminada</option>
-                    <option value="Vacía">Vacía</option>
-                    <option value="Aborto">Aborto</option>
-                </select>
+                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar hembra por arete o nombre...">
             </div>
         </div>
 
-        <!-- Tabla -->
+        <!-- Tabla de Hembras -->
         <div class="table-card">
             <table class="custom-table">
                 <thead>
                     <tr>
-                        <th>Hembra / Arete</th>
-                        <th>Estado Gestacional</th>
-                        <th>Fecha Inseminación</th>
-                        <th>Semental / Pajilla</th>
-                        <th>Fecha Probable Parto</th>
-                        <th>Observaciones / Complicaciones</th>
+                        <th>Arete SINIIGA</th>
+                        <th>Nombre / Alias</th>
+                        <th>Etapa</th>
+                        <th>Estado General</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let reg of registrosFiltrados">
+                    <tr *ngFor="let animal of expedientesFiltrados">
                         <td>
                             <div class="animal-cell">
-                                <span class="arete">{{ reg.hembraId }}</span>
-                                <span class="nombre-alias">{{ reg.nombreHembra || 'Sin alias' }}</span>
+                                <span class="arete">{{ animal.areteSiniiga }}</span>
                             </div>
                         </td>
+                        <td><strong>{{ animal.nombreOpcional || 'N/D' }}</strong></td>
+                        <td>{{ animal.etapaDesarrollo || 'N/D' }}</td>
                         <td>
                             <span class="status-chip" [ngClass]="{
-                                'prenada': reg.estado === 'Preñada',
-                                'inseminada': reg.estado === 'Inseminada',
-                                'vacia': reg.estado === 'Vacía',
-                                'aborto': reg.estado === 'Aborto'
-                            }">{{ reg.estado }}</span>
+                                'active': animal.estado === 'Activo',
+                                'warning': animal.estado === 'En Tratamiento',
+                                'sold': animal.estado === 'Vendido',
+                                'danger': animal.estado === 'Fallecido'
+                            }">{{ animal.estado | uppercase }}</span>
                         </td>
-                        <td>{{ reg.fechaInseminacion ? (reg.fechaInseminacion | date:'shortDate') : 'N/A' }}</td>
-                        <td><strong>{{ reg.toroIdOpcional || 'N/D' }}</strong></td>
-                        <td>{{ reg.fechaProbableParto ? (reg.fechaProbableParto | date:'shortDate') : 'N/A' }}</td>
-                        <td>{{ reg.complicaciones || 'Sin notas' }}</td>
+                        <td>
+                            <button class="btn-primary" style="padding: 6px 12px; font-size: 0.85rem;"
+                                (click)="abrirExpediente(animal)">
+                                <span class="material-symbols-outlined" style="font-size: 1.1rem;">folder_open</span>
+                                Ver Expediente
+                            </button>
+                        </td>
                     </tr>
-                    <tr *ngIf="registrosFiltrados.length === 0">
-                        <td colspan="6" class="empty-message">No se encontraron registros de reproducción con los filtros actuales.</td>
+                    <tr *ngIf="expedientesFiltrados.length === 0">
+                        <td colspan="5" class="empty-message">No se encontraron hembras registradas en el inventario.
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -73,60 +64,171 @@
     </div>
 
 
-    <!-- ================= VISTA 2: FORMULARIO ================= -->
+    <!-- ================= VISTA 2: EXPEDIENTE REPRODUCTIVO ================= -->
+    <div *ngIf="vistaActual === 'expediente' && animalSeleccionadoExpediente" class="form-container-wrapper">
+        <header class="section-header">
+            <div class="header-text">
+                <h1>Expediente Reproductivo: <span class="text-accent">{{ animalSeleccionadoExpediente.areteSiniiga
+                        }}</span></h1>
+                <p>Alias: {{ animalSeleccionadoExpediente.nombreOpcional || 'N/D' }}</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-secondary" (click)="irALista()">
+                    <span class="material-symbols-outlined">arrow_back</span> Regresar
+                </button>
+                <button class="btn-primary" (click)="nuevoEventoDesdeExpediente()">
+                    <span class="material-symbols-outlined">add</span> Nuevo Evento
+                </button>
+            </div>
+        </header>
+
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Tipo de Evento</th>
+                        <th>Fecha</th>
+                        <th>Resultado / Detalles</th>
+                        <th>Observaciones / Notas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let evento of eventosDelExpediente">
+                        <td>
+                            <span class="status-chip" [ngClass]="{
+        'celo': evento.tipo === 'Celo',
+        'monta': evento.tipo === 'Monta / Inseminación',
+        'diagnostico': evento.tipo === 'Diagnóstico de Gestación',
+        'secado': evento.tipo === 'Secado',
+        'parto': evento.tipo === 'Parto'
+    }">
+                                {{ evento.tipo }}
+                            </span>
+                        </td>
+                        <td>{{ evento.fecha }}</td>
+                        <td>
+                            <div *ngIf="evento.tipo === 'Monta / Inseminación'">Semental: <strong>{{
+                                    evento.toroInvolucrado }}</strong></div>
+                            <div *ngIf="evento.tipo === 'Diagnóstico de Gestación'">Resultado: <strong>{{
+                                    evento.resultadoTacto }}</strong></div>
+                            <div
+                                *ngIf="evento.tipo === 'Diagnóstico de Gestación' && evento.resultadoTacto === 'Positivo (Gestante)' && evento.fechaProbableParto">
+                                FPP: <strong>{{ evento.fechaProbableParto }}</strong>
+                            </div>
+                            <!-- Quitamos el acento de la variable generoCria aquí -->
+                            <div *ngIf="evento.tipo === 'Parto'">Crías: <strong>{{ evento.criasNacidas }} ({{
+                                    evento.generoCria }})</strong></div>
+                            <div *ngIf="evento.tipo === 'Celo' || evento.tipo === 'Secado'">- N/A -</div>
+                        </td>
+                        <td>{{ evento.observaciones || 'Sin notas' }}</td>
+                        <td>
+                            <button class="action-btn edit" (click)="editarEvento(evento)" title="Editar Evento">
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="eventosDelExpediente.length === 0">
+                        <td colspan="5" class="empty-message">No hay eventos reproductivos registrados para esta hembra.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- ================= VISTA 3: FORMULARIO DINÁMICO ================= -->
     <div *ngIf="vistaActual === 'formulario'" class="form-container-wrapper">
         <header class="section-header">
             <div class="header-text">
-                <h1>Nuevo <span class="text-accent">Registro Reproductivo</span></h1>
-                <p>Captura los datos del servicio de inseminación o diagnóstico clínico.</p>
+                <h1>{{ modoEdicion ? 'Editar' : 'Nuevo' }} <span class="text-accent">Registro Reproductivo</span></h1>
+                <p>Captura los datos del servicio, diagnóstico clínico o parto para el vientre: {{
+                    animalSeleccionadoExpediente?.areteSiniiga }}</p>
             </div>
-            <button class="btn-secondary" (click)="cambiarVista('lista')">
-                <span class="material-symbols-outlined">arrow_back</span>
-                Regresar
+            <button class="btn-secondary" (click)="vistaActual = 'expediente'">
+                <span class="material-symbols-outlined">close</span> Cancelar
             </button>
         </header>
 
-        <form (ngSubmit)="guardarReproduccion()" class="bovine-form">
+        <form (ngSubmit)="guardarEvento()" class="bovine-form">
             <div class="form-card">
                 <h3>Detalles del Servicio / Gestación</h3>
                 <div class="form-grid">
+
                     <div class="form-group">
-                        <label>Arete SINIIGA (Hembra) *</label>
-                        <input type="text" [(ngModel)]="nuevoRegistro.hembraId" name="hembraId" placeholder="Ej. 01 2345 6789" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nombre o Alias (Opcional)</label>
-                        <input type="text" [(ngModel)]="nuevoRegistro.nombreHembra" name="nombreHembra" placeholder="Ej. La Pinta">
-                    </div>
-                    <div class="form-group">
-                        <label>Fecha de Inseminación / Servicio</label>
-                        <input type="date" [(ngModel)]="nuevoRegistro.fechaInseminacion" name="fechaInseminacion">
-                    </div>
-                    <div class="form-group">
-                        <label>Semental / Pajilla (Opcional)</label>
-                        <input type="text" [(ngModel)]="nuevoRegistro.toroIdOpcional" name="toroIdOpcional" placeholder="Ej. Pajilla Holstein #44">
-                    </div>
-                    <div class="form-group">
-                        <label>Estado Gestacional *</label>
-                        <select [(ngModel)]="nuevoRegistro.estado" name="estado" required>
-                            <option value="Inseminada">Inseminada</option>
-                            <option value="Preñada">Preñada</option>
-                            <option value="Vacía">Vacía</option>
-                            <option value="Aborto">Aborto</option>
+                        <label>Tipo de Evento *</label>
+                        <select [(ngModel)]="nuevoEvento.tipo" name="tipo" required>
+                            <option value="Celo">Celo</option>
+                            <option value="Monta / Inseminación">Monta / Inseminación</option>
+                            <option value="Diagnóstico de Gestación">Diagnóstico de Gestación (Tacto)</option>
+                            <option value="Secado">Secado</option>
+                            <option value="Parto">Parto</option>
                         </select>
                     </div>
+
+                    <div class="form-group">
+                        <label>Fecha del Evento *</label>
+                        <input type="date" [(ngModel)]="nuevoEvento.fecha" name="fecha" required>
+                    </div>
+
+                    <div class="form-group full-width" *ngIf="nuevoEvento.tipo === 'Monta / Inseminación'">
+                        <label>Semental / Pajilla *</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.toroInvolucrado" name="toroInvolucrado"
+                            placeholder="Ej. Toro Angus #45 o Semen Lote B">
+                    </div>
+
+                    <div class="form-group" *ngIf="nuevoEvento.tipo === 'Diagnóstico de Gestación'">
+                        <label>Resultado del Tacto *</label>
+                        <select [(ngModel)]="nuevoEvento.resultadoTacto" name="resultadoTacto">
+                            <option value="Positivo (Gestante)">Positivo (Gestante)</option>
+                            <option value="Negativo (Vacía)">Negativo (Vacía)</option>
+                            <option value="Dudoso">Dudoso</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"
+                        *ngIf="nuevoEvento.tipo === 'Diagnóstico de Gestación' && nuevoEvento.resultadoTacto === 'Positivo (Gestante)'">
+                        <label>Fecha Probable de Parto (FPP)</label>
+                        <input type="date" [(ngModel)]="nuevoEvento.fechaProbableParto" name="fechaProbableParto">
+                    </div>
+
+                    <div class="form-group" *ngIf="nuevoEvento.tipo === 'Parto'">
+                        <label>Número de Crías Nacidas *</label>
+                        <input type="number" [(ngModel)]="nuevoEvento.criasNacidas" name="criasNacidas" min="1">
+                    </div>
+
+                    <div class="form-group" *ngIf="nuevoEvento.tipo === 'Parto'">
+                        <label>Género de la Cría</label>
+                        <!-- Quitamos el acento de la variable generoCria aquí -->
+                        <select [(ngModel)]="nuevoEvento.generoCria" name="generoCria">
+                            <option value="Macho">Macho</option>
+                            <option value="Hembra">Hembra</option>
+                            <option value="Mixto">Mixto (Gemelos)</option>
+                        </select>
+                    </div>
+
                     <div class="form-group full-width">
                         <label>Complicaciones o Notas Veterinarias</label>
-                        <textarea [(ngModel)]="nuevoRegistro.complicaciones" name="complicaciones" rows="2" placeholder="Diagnóstico por palpación, tratamientos de sincronización de celo..."></textarea>
+                        <textarea [(ngModel)]="nuevoEvento.observaciones" name="observaciones" rows="2"
+                            placeholder="Diagnóstico por palpación, tratamientos de sincronización de celo, etc..."></textarea>
                     </div>
+
+                    <div class="form-group">
+                        <label>Veterinario / Técnico Encargado</label>
+                        <input type="text" [(ngModel)]="nuevoEvento.veterinarioEncargado" name="veterinarioEncargado"
+                            placeholder="Ej. MVZ Pérez">
+                    </div>
+
                 </div>
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn-secondary" (click)="cambiarVista('lista')">Cancelar</button>
-                <button type="submit" class="btn-primary">Guardar Registro Reproductivo</button>
+                <button type="button" class="btn-secondary" (click)="vistaActual = 'expediente'">Cancelar</button>
+                <button type="submit" class="btn-primary">
+                    {{ modoEdicion ? 'Actualizar Evento' : 'Guardar Registro Reproductivo' }}
+                </button>
             </div>
         </form>
     </div>
-
 </div>

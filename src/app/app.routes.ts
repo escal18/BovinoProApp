@@ -12,7 +12,7 @@ export const routes: Routes = [
   { path: '', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'inventario', component: InventarioComponent, canActivate: [authGuard] },
   { path: 'salud', component: SaludComponent, canActivate: [authGuard] },
-  { path: 'produccion', component: ProduccionComponent, canActivate: [authGuard] },
   { path: 'reproduccion', component: ReproduccionComponent, canActivate: [authGuard] },
+  { path: 'produccion', component: ProduccionComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

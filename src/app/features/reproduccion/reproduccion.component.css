@@ -25,7 +25,8 @@
     color: #3b82f6;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
     padding: 12px 24px;
     border-radius: 12px;
     display: flex;
@@ -43,7 +44,10 @@
     box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
 }
 
-.btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
 
 .btn-secondary {
     background: #f1f5f9;
@@ -51,7 +55,9 @@
     border: 1px solid #cbd5e1;
 }
 
-.btn-secondary:hover { background: #e2e8f0; }
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
 
 /* Filtros */
 .filters-card {
@@ -161,12 +167,31 @@
     text-transform: uppercase;
 }
 
-.status-chip.prenada { background: #dcfce7; color: #166534; }
-.status-chip.inseminada { background: #e0e7ff; color: #3730a3; }
-.status-chip.vacia { background: #fef3c7; color: #92400e; }
-.status-chip.aborto { background: #fee2e2; color: #991b1b; }
+.status-chip.prenada {
+    background: #dcfce7;
+    color: #166534;
+}
 
-.empty-message { text-align: center; color: #64748b; padding: 40px !important; }
+.status-chip.inseminada {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.status-chip.vacia {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-chip.aborto {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.empty-message {
+    text-align: center;
+    color: #64748b;
+    padding: 40px !important;
+}
 
 /* Formularios */
 .form-card {
@@ -199,7 +224,9 @@
     gap: 8px;
 }
 
-.form-group.full-width { grid-column: 1 / -1; }
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
 
 .form-group label {
     font-size: 0.85rem;
@@ -207,7 +234,9 @@
     color: #475569;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
     padding: 12px;
     border-radius: 12px;
     border: 1px solid #cbd5e1;
@@ -216,7 +245,9 @@
     background: #f8fafc;
 }
 
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     border-color: #3b82f6;
     background: #ffffff;
 }
@@ -229,6 +260,77 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
+/* ================= COLORES DE ESTADO (IGUAL QUE EN REGISTRO) ================= */
+.status-chip {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Estados de Salud / Generales */
+.status-chip.active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-chip.warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-chip.sold {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.status-chip.danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* ================= COLORES DE EVENTOS REPRODUCTIVOS ================= */
+.status-chip.celo {
+    background-color: #fce7f3;
+    color: #be185d;
+}
+
+/* Rosa */
+.status-chip.monta {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+/* Azul */
+.status-chip.diagnostico {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+/* Amarillo/Naranja */
+.status-chip.secado {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+/* Gris */
+.status-chip.parto {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+/* Verde */

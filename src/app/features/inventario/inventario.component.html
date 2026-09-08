@@ -176,7 +176,6 @@
                             <option value="Activo">Activo</option>
                             <option value="En Tratamiento">En Tratamiento</option>
                             <option value="Vendido">Vendido</option>
-                            <!-- Solo mostramos Fallecido si estamos editando un registro existente -->
                             <option *ngIf="modoEdicion" value="Fallecido">Fallecido</option>
                         </select>
                     </div>
@@ -184,6 +183,28 @@
                         <label>Observaciones o Notas Clínicas</label>
                         <textarea [(ngModel)]="nuevoAnimal.notas" name="notas" rows="3"
                             placeholder="Detalles relevantes sobre temperamento, marcas o historiales..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3: Genealogía -->
+            <div class="form-card">
+                <h3>3. Genealogía (Opcional)</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Madre (Seleccionar del Hato)</label>
+                        <select [(ngModel)]="nuevoAnimal.madreId" name="madreId">
+                            <option [ngValue]="undefined">-- Desconocida / Externa --</option>
+                            <option *ngFor="let madre of posiblesMadres" [value]="madre.areteSiniiga">
+                                {{ madre.areteSiniiga }} {{ madre.nombreOpcional ? '(' + madre.nombreOpcional + ')' : ''
+                                }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Padre (Arete, Nombre o Pajilla)</label>
+                        <input type="text" [(ngModel)]="nuevoAnimal.padreId" name="padreId"
+                            placeholder="Ej. Toro Angus #45">
                     </div>
                 </div>
             </div>
@@ -227,6 +248,11 @@
                     <li><span>Género:</span> <strong>{{ animalSeleccionado.genero }}</strong></li>
                     <li><span>Fecha de Nacimiento:</span> <strong>{{ animalSeleccionado.fechaNacimiento |
                             date:'longDate' }}</strong></li>
+
+                    <!-- Datos de Genealogía en el Detalle -->
+                    <li><span>Madre:</span> <strong>{{ animalSeleccionado.madreId || 'Desconocida' }}</strong></li>
+                    <li><span>Padre:</span> <strong>{{ animalSeleccionado.padreId || 'Desconocido' }}</strong></li>
+
                     <li><span>Peso Actual:</span> <strong>{{ animalSeleccionado.pesoActualKg }} kg</strong></li>
                     <li><span>Ubicación:</span> <strong>{{ animalSeleccionado.loteUbicacion }}</strong></li>
                     <li>

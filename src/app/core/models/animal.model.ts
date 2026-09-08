@@ -16,4 +16,6 @@ export interface Animal {
     notas?: string;
     madreId?: string;
     padreId?: string;
+    areteMadre?: string;
+    aretePadre?: string;
 }

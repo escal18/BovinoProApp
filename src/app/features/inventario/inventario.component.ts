@@ -51,15 +51,40 @@ export class InventarioComponent implements OnInit {
   }
 
   // Lógica de filtrado para la tabla
-  get animalesFiltrados(): Animal[] {
-    return this.listaAnimales.filter(animal => {
-      const coincideBusqueda = animal.areteSiniiga.toLowerCase().includes(this.filtroBusqueda.toLowerCase()) ||
+  get animalesFiltrados() {
+    // 1. Definimos el orden lógico de las etapas
+    const ordenEtapas: { [key: string]: number } = {
+      'Ternera': 1,
+      'Becerra': 2,
+      'Productora': 3,
+      'Seca': 4,
+      'Semental': 5
+    };
+
+    // 2. Filtramos la lista como lo hacíamos normalmente
+    let filtrados = this.listaAnimales.filter(animal => {
+      const coincideBusqueda = animal.areteSiniiga?.toLowerCase().includes(this.filtroBusqueda.toLowerCase()) ||
                                (animal.nombreOpcional && animal.nombreOpcional.toLowerCase().includes(this.filtroBusqueda.toLowerCase()));
-      const coincideEstado = this.filtroEstado ? animal.estado === this.filtroEstado : true;
       const coincideEtapa = this.filtroEtapa ? animal.etapaDesarrollo === this.filtroEtapa : true;
-      
-      return coincideBusqueda && coincideEstado && coincideEtapa;
+      const coincideEstado = this.filtroEstado ? animal.estado === this.filtroEstado : true;
+
+      return coincideBusqueda && coincideEtapa && coincideEstado;
     });
+
+    // 3. Ordenamos usando nuestra jerarquía
+    return filtrados.sort((a, b) => {
+      const etapaA = ordenEtapas[a.etapaDesarrollo || ''] || 99; // 99 si no tiene etapa asignada
+      const etapaB = ordenEtapas[b.etapaDesarrollo || ''] || 99;
+      return etapaA - etapaB;
+    });
+  }
+
+  // Obtenemos solo las hembras que ya están en etapa reproductiva
+  get posiblesMadres() {
+    return this.listaAnimales.filter(animal => 
+      animal.genero === 'Hembra' && 
+      (animal.etapaDesarrollo === 'Productora' || animal.etapaDesarrollo === 'Seca')
+    );
   }
 
   // Controlador de navegación entre vistas (Lista, Formulario, Detalle)
