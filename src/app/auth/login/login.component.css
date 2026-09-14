@@ -1,9 +1,15 @@
+/* Asegura que el padding no expanda el ancho del 100% de ningún elemento */
+* {
+    box-sizing: border-box;
+}
+
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     background-color: #f8fafc;
+    padding: 20px;
 }
 
 .login-card {
@@ -22,25 +28,24 @@
     margin-bottom: 30px;
 }
 
-/* Contenedor del logo adaptado para el Login */
 .logo-cow-container {
-    width: 72px;                /* Tamaño más grande para destacar */
-    height: 72px;               
-    margin: 0 auto 16px auto;   /* Centrado automático y espacio inferior */
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #eff6ff;  /* Fondo sutil azul */
-    color: #3b82f6;             /* Color principal (aplica al currentColor del SVG) */
-    border-radius: 18px;        /* Bordes más redondeados */
+    background-color: #eff6ff;
+    color: #3b82f6;
+    border-radius: 18px;
     padding: 12px;
+    transition: all 0.3s ease;
 }
 
-/* Ajuste interno del icono de la vaca */
 .nav-cow-svg {
     width: 100%;
     height: 100%;
-    fill: currentColor;         /* Toma el color #3b82f6 del contenedor */
+    fill: currentColor;
 }
 
 .login-header h2 {
@@ -48,6 +53,7 @@
     font-size: 1.8rem;
     color: #0f172a;
     font-weight: 800;
+    transition: font-size 0.3s ease;
 }
 
 .text-accent {
@@ -82,6 +88,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .input-with-icon span {
@@ -150,5 +157,54 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* ================= DISEÑO RESPONSIVE ================= */
+
+/* Pantallas medianas y transición de ventana (Tablets y Laptops reducidas) */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 35px 25px;
+    }
+}
+
+/* Teléfonos móviles */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 15px;
+    }
+
+    .login-card {
+        padding: 30px 20px;
+        border-radius: 20px;
+    }
+
+    .logo-cow-container {
+        width: 60px;
+        height: 60px;
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .login-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .login-header p {
+        font-size: 0.85rem;
+    }
+
+    .input-with-icon input {
+        padding: 12px 12px 12px 36px;
+        font-size: 1rem;
+    }
+
+    .input-with-icon span {
+        left: 10px;
+    }
+
+    .login-btn {
+        padding: 12px;
     }
 }

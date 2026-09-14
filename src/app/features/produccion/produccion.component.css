@@ -107,6 +107,7 @@
     padding: 20px;
     border-radius: 20px;
     border: 1px solid #e2e8f0;
+    flex-wrap: wrap;
 }
 
 .search-box {
@@ -130,14 +131,33 @@
     font-weight: 600;
 }
 
-.filter-select {
-    padding: 10px 15px;
+/* ================= ESTILOS UNIFICADOS PARA SELECTS ================= */
+.filter-select,
+.form-group select {
+    padding: 12px 40px 12px 15px;
     border-radius: 12px;
     border: 1px solid #cbd5e1;
-    background: white;
+    background-color: #ffffff;
     font-weight: 600;
     color: #475569;
     outline: none;
+    font-size: 0.95rem;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-select:focus,
+.form-group select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Tabla */
@@ -148,6 +168,24 @@
     border: 1px solid #e2e8f0;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     overflow-x: auto;
+}
+
+.table-card::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-card::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.table-card::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.table-card::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .custom-table {
@@ -268,7 +306,6 @@
 }
 
 .form-group input,
-.form-group select,
 .form-group textarea {
     padding: 12px;
     border-radius: 12px;
@@ -276,13 +313,14 @@
     font-size: 0.95rem;
     outline: none;
     background: #f8fafc;
+    transition: all 0.2s ease;
 }
 
 .form-group input:focus,
-.form-group select:focus,
 .form-group textarea:focus {
     border-color: #3b82f6;
     background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-actions {
@@ -329,13 +367,11 @@
 .diff-badge.positive {
     background: #dcfce7;
     color: #166534;
-    /* Sobrante o más vendido */
 }
 
 .diff-badge.negative {
     background: #fee2e2;
     color: #991b1b;
-    /* Faltante o merma */
 }
 
 .action-btn.edit {
@@ -363,7 +399,7 @@
     font-weight: 600;
 }
 
-/* ================= ESTILOS PARA LAS CARPETAS SEMANALES ================= */
+/* ================= CARPETAS SEMANALES ================= */
 .folder-card {
     background: #ffffff;
     border-radius: 20px;
@@ -409,6 +445,7 @@
     gap: 15px;
     font-size: 0.9rem;
     color: #475569;
+    flex-wrap: wrap;
 }
 
 .folder-stats span {
@@ -421,17 +458,16 @@
     gap: 5px;
 }
 
-/* ================= CALENDARIO DE BÚSQUEDA MEJORADO ================= */
-
+/* ================= CALENDARIO DE BÚSQUEDA ================= */
 .date-filter-wrapper {
     display: flex;
     align-items: center;
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 12px;
-    padding: 0 8px 0 15px; /* Espacio ajustado para el botón */
+    padding: 0 8px 0 15px;
     transition: all 0.2s ease;
-    height: 42px; /* Misma altura que el input de búsqueda y el select */
+    height: 42px;
 }
 
 .date-filter-wrapper:focus-within {
@@ -455,11 +491,9 @@
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
-    /* Ajuste para que ocupe el espacio sin empujar */
     padding: 0;
 }
 
-/* Personalizar sutilmente la flecha/icono del navegador webkit (Chrome/Edge) */
 .date-filter-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     opacity: 0.6;
@@ -470,7 +504,6 @@
     opacity: 1;
 }
 
-/* Botón rojo integrado para limpiar la fecha */
 .clear-date-btn {
     background: #fee2e2;
     color: #dc2626;
@@ -490,4 +523,113 @@
 .clear-date-btn:hover {
     background: #fca5a5;
     transform: scale(1.05);
+}
+
+/* ================= DISEÑO RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .produccion-wrapper {
+        padding: 10px 15px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .section-header h1 {
+        font-size: 1.6rem;
+    }
+
+    /* Mantiene el orden correcto del título y descarta el reverso de botones */
+    .section-header>div:not(.header-text) {
+        width: 100%;
+        flex-direction: column-reverse;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filters-card {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .search-box {
+        max-width: 100%;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .date-filter-wrapper {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .filter-select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-card {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .table-card {
+        padding: 10px 0;
+        border-radius: 16px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        padding: 12px 15px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .folder-header {
+        padding: 12px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .folder-stats {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        /* Dos columnas compactas en móviles */
+        gap: 8px;
+    }
+
+    .folder-stats span {
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: space-between;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        white-space: nowrap; /* Fuerza a que el número y la 'L' vayan siempre juntos en el mismo renglón */
+    }
 }

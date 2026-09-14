@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -11,10 +11,21 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
   
-  constructor(private authService: AuthService) {}
+  menuAbierto: boolean = false;
+
+  toggleMenu() {
+    this.menuAbierto = !this.menuAbierto;
+  }
+
+  cerrarMenu() {
+    this.menuAbierto = false;
+  }
 
   cerrarSesion() {
     this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

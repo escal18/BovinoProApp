@@ -59,7 +59,7 @@
     background: #e2e8f0;
 }
 
-/* Filtros */
+/* ================= FILTROS Y BÚSQUEDA ================= */
 .filters-card {
     display: flex;
     justify-content: space-between;
@@ -98,17 +98,39 @@
     gap: 15px;
 }
 
-.filter-select {
-    padding: 10px 15px;
+/* ================= ESTILOS UNIFICADOS PARA SELECTS ================= */
+.filter-select,
+.form-group select {
+    padding: 12px 40px 12px 15px;
+    /* Más espacio a la derecha para la flecha */
     border-radius: 12px;
     border: 1px solid #cbd5e1;
-    background: white;
+    background-color: #ffffff;
     font-weight: 600;
     color: #475569;
     outline: none;
+    font-size: 0.95rem;
+
+    /* Quitar diseño nativo de iOS/Android */
+    appearance: none;
+    -webkit-appearance: none;
+
+    /* Flecha personalizada */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-/* Tabla */
+.filter-select:focus,
+.form-group select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ================= TABLA DE GANADO ================= */
 .table-card {
     background: #ffffff;
     border-radius: 24px;
@@ -116,6 +138,25 @@
     border: 1px solid #e2e8f0;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     overflow-x: auto;
+}
+
+/* Barra de scroll delgada y moderna para la tabla */
+.table-card::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-card::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.table-card::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.table-card::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .custom-table {
@@ -169,20 +210,19 @@
     color: #92400e;
 }
 
-/* Nuevo color para Vendido */
 .status-chip.sold {
     background-color: #e2e8f0;
-    /* Fondo gris claro */
     color: #475569;
-    /* Texto gris oscuro */
 }
 
-/* Nuevo color para Fallecido */
 .status-chip.danger {
     background-color: #fee2e2;
-    /* Fondo rojo claro */
     color: #dc2626;
-    /* Texto rojo oscuro */
+}
+
+.action-buttons-group {
+    display: flex;
+    gap: 8px;
 }
 
 .action-btn {
@@ -203,15 +243,30 @@
     background: #dbeafe;
 }
 
+.action-btn.edit {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.action-btn.edit:hover {
+    background: #fde68a;
+}
+
 .empty-message {
     text-align: center;
     color: #64748b;
     padding: 40px !important;
 }
 
-/* Formularios y Vistas de Detalle */
+.header-actions-group {
+    display: flex;
+    gap: 12px;
+}
+
+/* ================= FORMULARIOS Y DETALLES ================= */
 .form-card,
-.detail-card {
+.detail-card,
+.detail-card-wide {
     background: #ffffff;
     padding: 25px;
     border-radius: 24px;
@@ -221,7 +276,8 @@
 }
 
 .form-card h3,
-.detail-card h3 {
+.detail-card h3,
+.detail-card-wide h3 {
     margin: 0 0 20px 0;
     font-size: 1.1rem;
     font-weight: 800;
@@ -253,7 +309,6 @@
 }
 
 .form-group input,
-.form-group select,
 .form-group textarea {
     padding: 12px;
     border-radius: 12px;
@@ -261,13 +316,14 @@
     font-size: 0.95rem;
     outline: none;
     background: #f8fafc;
+    transition: all 0.2s ease;
 }
 
 .form-group input:focus,
-.form-group select:focus,
 .form-group textarea:focus {
     border-color: #3b82f6;
     background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-actions {
@@ -277,7 +333,7 @@
     margin-top: 20px;
 }
 
-/* Detalle Grid */
+/* ================= VISTA DE DETALLE ================= */
 .detail-grid-layout {
     display: grid;
     grid-template-columns: 380px 1fr;
@@ -300,23 +356,6 @@
     border-bottom: 1px solid #f1f5f9;
     font-size: 0.9rem;
     color: #64748b;
-}
-
-.detail-card-wide {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 24px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-}
-
-.detail-card-wide h3 {
-    margin: 0 0 20px 0;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #0f172a;
-    border-bottom: 2px solid #f1f5f9;
-    padding-bottom: 10px;
 }
 
 .metrics-preview-box {
@@ -375,21 +414,109 @@
     }
 }
 
-.action-buttons-group {
-    display: flex;
-    gap: 8px;
+/* ================= DISEÑO RESPONSIVE ================= */
+
+/* Pantallas medianas (Tablets) */
+@media (max-width: 992px) {
+    .detail-grid-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-card {
+        flex-direction: column;
+    }
+
+    .search-box {
+        max-width: 100%;
+    }
 }
 
-.action-btn.edit {
-    background: #fef3c7;
-    color: #d97706;
-}
+/* Teléfonos Móviles */
+@media (max-width: 768px) {
+    .inventario-wrapper {
+        padding: 10px 15px;
+    }
 
-.action-btn.edit:hover {
-    background: #fde68a;
-}
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
 
-.header-actions-group {
-    display: flex;
-    gap: 12px;
+    .header-text h1 {
+        font-size: 1.6rem;
+    }
+
+    .header-actions-group {
+        width: 100%;
+        flex-direction: column-reverse;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .form-card,
+    .detail-card,
+    .detail-card-wide {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .metrics-preview-box {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Mejoras en la Tabla para Móviles */
+    .table-card {
+        padding: 10px 0;
+        border-radius: 16px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .custom-table th {
+        padding: 12px 15px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .custom-table td {
+        padding: 12px 15px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .action-btn span {
+        font-size: 1.1rem;
+    }
 }

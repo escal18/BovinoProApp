@@ -1,3 +1,4 @@
+/* ================= BARRA SUPERIOR (ESCRITORIO) ================= */
 .top-navbar {
     position: sticky;
     top: 0;
@@ -8,9 +9,8 @@
     padding: 0 30px;
     height: 70px;
     background-color: #ffffff;
-    border-bottom: 2px solid #e2e8f0;
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
-    /* Navbar más destacado */
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.05);
 }
 
 .navbar-brand {
@@ -46,15 +46,24 @@
     color: #3b82f6;
 }
 
+/* ================= MENÚ PRINCIPAL (ESCRITORIO) ================= */
 .navbar-menu {
     display: flex;
+    flex-direction: row;
+    position: static;
     gap: 10px;
     list-style: none;
     margin: 0;
     padding: 0;
+    background: transparent;
+    box-shadow: none;
+    clip-path: none;
 }
 
-/* Opciones del menú con diseño de botón interactivo */
+.navbar-menu li {
+    list-style: none;
+}
+
 .navbar-menu a {
     text-decoration: none;
     color: #64748b;
@@ -65,17 +74,22 @@
     transition: all 0.2s ease-in-out;
 }
 
-/* Efecto Hover: Solo se resalta la opción sobre la que está el cursor */
 .navbar-menu a:hover {
     background-color: #f1f5f9;
     color: #1e293b;
 }
 
-/* Opción Seleccionada (Activa) */
 .navbar-menu a.active {
     background-color: #3b82f6;
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+/* ================= PERFIL Y CERRAR SESIÓN (ESCRITORIO) ================= */
+.navbar-profile-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .navbar-profile {
@@ -88,34 +102,148 @@
 
 .user-icon {
     font-size: 2rem;
+    color: #94a3b8;
 }
 
 .user-name {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.user-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1e293b;
 }
 
 .logout-btn {
     background: transparent;
     border: 1px solid #cbd5e1;
-    color: #3b82f6; /* Azul principal de BovinoPro */
+    color: #3b82f6;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 8px;
-    border-radius: 12px;
+    border-radius: 10px;
     transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-    background: #eff6ff;   /* Fondo azul muy sutil */
-    border-color: #93c5fd; /* Borde en tono azul claro */
-    color: #1d4ed8;        /* Azul más oscuro y definido al hacer hover */
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+/* ================= DISEÑO RESPONSIVE (MÓVILES Y TABLETS) ================= */
+.mobile-menu-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: #0f172a;
+    cursor: pointer;
+    padding: 8px;
+    transition: transform 0.2s ease;
+}
+
+.mobile-menu-btn span {
+    font-size: 2.2rem;
+}
+
+.mobile-only-profile {
+    display: none;
+}
+
+/* Ajustes para Laptops pequeñas y Tablets */
+@media (max-width: 992px) {
+    .navbar-menu {
+        gap: 5px;
+    }
+
+    .navbar-menu a {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Ajustes para Teléfonos Móviles */
+@media (max-width: 768px) {
+    .top-navbar {
+        padding: 0 20px;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* Transformación del menú a un panel vertical limpio */
+    .navbar-menu {
+        position: absolute;
+        top: 100%;
+        /* Elimina el hueco gris */
+        left: 0;
+        right: 0;
+        /* Previene el scroll horizontal */
+        box-sizing: border-box;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        margin: 0;
+        gap: 8px;
+        list-style: none !important;
+        /* Elimina viñetas */
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+
+        /* Efecto persiana */
+        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+        transition: clip-path 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .navbar-menu.show-mobile {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    .navbar-menu li {
+        list-style: none !important;
+        width: 100%;
+    }
+
+    .navbar-menu a {
+        display: block;
+        padding: 14px 16px;
+        font-size: 1.05rem;
+        text-align: center;
+        border-radius: 12px;
+    }
+
+    /* Área de perfil al final del menú desplegable */
+    .mobile-only-profile {
+        display: block;
+        margin-top: 10px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .mobile-profile-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .mobile-logout {
+        width: 100%;
+        justify-content: center;
+        padding: 14px;
+        gap: 8px;
+        background-color: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fca5a5;
+        font-weight: 700;
+        border-radius: 12px;
+    }
+
+    .mobile-logout:hover {
+        background-color: #fee2e2;
+    }
 }

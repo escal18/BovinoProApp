@@ -10,21 +10,41 @@
         <span class="brand-text">Bovino<span class="text-accent">Pro</span></span>
     </div>
 
-    <ul class="navbar-menu">
-        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Dashboard</a></li>
-        <li><a routerLink="/inventario" routerLinkActive="active">Registro</a></li>
-        <li><a routerLink="/salud" routerLinkActive="active">Salud</a></li>
-        <li><a routerLink="/reproduccion" routerLinkActive="active">Reproducción</a></li>
-        <li><a routerLink="/produccion" routerLinkActive="active">Producción</a></li>
+    <!-- Botón Hamburguesa (Solo Móviles) -->
+    <button class="mobile-menu-btn" (click)="toggleMenu()" aria-label="Alternar menú">
+        <span class="material-symbols-outlined">{{ menuAbierto ? 'close' : 'menu' }}</span>
+    </button>
+
+    <!-- Menú de Navegación -->
+    <ul class="navbar-menu" [class.show-mobile]="menuAbierto">
+        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                (click)="cerrarMenu()">Dashboard</a></li>
+        <li><a routerLink="/inventario" routerLinkActive="active" (click)="cerrarMenu()">Registro</a></li>
+        <li><a routerLink="/salud" routerLinkActive="active" (click)="cerrarMenu()">Salud</a></li>
+        <li><a routerLink="/reproduccion" routerLinkActive="active" (click)="cerrarMenu()">Reproducción</a></li>
+        <li><a routerLink="/produccion" routerLinkActive="active" (click)="cerrarMenu()">Producción</a></li>
+
+        <!-- Perfil inyectado al final del menú (Solo Móviles) -->
+        <li class="mobile-only-profile">
+            <div class="mobile-profile-wrapper">
+                <div class="navbar-profile">
+                    <span class="material-symbols-outlined user-icon">account_circle</span>
+                    <span class="user-name">Administrador</span>
+                </div>
+                <button class="logout-btn mobile-logout" (click)="cerrarSesion()" title="Cerrar Sesión">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </li>
     </ul>
 
-    <!-- Aquí agregamos el botón manteniendo tu clase navbar-profile -->
-    <div class="navbar-profile-wrapper" style="display: flex; align-items: center; gap: 15px;">
+    <!-- Perfil Estándar (Solo Desktop) -->
+    <div class="navbar-profile-wrapper desktop-only">
         <div class="navbar-profile">
             <span class="material-symbols-outlined user-icon">account_circle</span>
             <span class="user-name">Administrador</span>
         </div>
-
         <button class="logout-btn" (click)="cerrarSesion()" title="Cerrar Sesión">
             <span class="material-symbols-outlined">logout</span>
         </button>
