@@ -155,7 +155,10 @@
                     <span class="material-symbols-outlined">event_available</span>
                     <p>Sin partos programados este mes.</p>
                 </div>
-                <a routerLink="/reproduccion" class="alert-link">Ver las {{ vacasGestantes }} gestaciones &rarr;</a>
+                <!-- Enlace actualizado para enviar el parámetro -->
+                <a [routerLink]="['/reproduccion']" [queryParams]="{ filtro: 'gestantes' }" class="alert-link">
+                    Ver las {{ vacasGestantes }} gestaciones &rarr;
+                </a>
             </div>
         </aside>
 

@@ -9,12 +9,19 @@
             </div>
         </header>
 
-        <!-- Barra de Filtros -->
+        <!-- Barra de Filtros Actualizada con Selector de Gestación -->
         <div class="filters-card">
             <div class="search-box">
                 <span class="material-symbols-outlined">search</span>
-                <input type="text" [(ngModel)]="filtroBusqueda" placeholder="Buscar hembra por arete o nombre...">
+                <input type="text" [(ngModel)]="filtroBusqueda" (input)="aplicarFiltros()"
+                    placeholder="Buscar hembra por arete o nombre...">
             </div>
+
+            <!-- Nuevo selector para filtrar por estado reproductivo -->
+            <select [(ngModel)]="filtroGestacion" (change)="aplicarFiltros()" class="filter-select highlight-select">
+                <option value="todas">Todas las Hembras</option>
+                <option value="gestantes">Solo Gestantes (Preñadas)</option>
+            </select>
         </div>
 
         <!-- Tabla de Hembras -->
@@ -62,7 +69,6 @@
             </table>
         </div>
     </div>
-
 
     <!-- ================= VISTA 2: EXPEDIENTE REPRODUCTIVO ================= -->
     <div *ngIf="vistaActual === 'expediente' && animalSeleccionadoExpediente" class="form-container-wrapper">
@@ -136,7 +142,6 @@
             </table>
         </div>
     </div>
-
 
     <!-- ================= VISTA 3: FORMULARIO DINÁMICO ================= -->
     <div *ngIf="vistaActual === 'formulario'" class="form-container-wrapper">

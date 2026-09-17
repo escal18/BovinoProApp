@@ -405,7 +405,6 @@
         font-size: 1.6rem;
     }
 
-    /* ¡CORRECCIÓN! Solo aplica el column-reverse a los botones de acción, no al texto */
     .section-header>div:not(.header-text) {
         width: 100%;
         display: flex;
@@ -419,8 +418,20 @@
         justify-content: center;
     }
 
+    /* ¡CORRECCIÓN! Apilar filtros verticalmente en móviles */
+    .filters-card {
+        flex-direction: column;
+        gap: 15px;
+    }
+
     .search-box {
         max-width: 100%;
+    }
+
+    /* Asegurar que el selector ocupe todo el ancho */
+    .filter-select {
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .form-card {

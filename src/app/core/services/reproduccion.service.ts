@@ -12,7 +12,8 @@ export class ReproduccionService {
 
   constructor() { }
 
-  getTodosLosEventos(): Observable<EventoReproduccion[]> {
+  // Renombrado a getEventos para coincidir con el componente
+  getEventos(): Observable<EventoReproduccion[]> {
     const q = query(this.reproduccionCollection, orderBy('fecha', 'desc'));
     return collectionData(q, { idField: 'id' }) as Observable<EventoReproduccion[]>;
   }

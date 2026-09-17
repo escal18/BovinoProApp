@@ -72,7 +72,7 @@ export class DashboardComponent implements OnInit {
     });
 
     // 3. Cargar Reproducción
-    this.reproduccionService.getTodosLosEventos().subscribe((eventos: EventoReproduccion[]) => {
+    this.reproduccionService.getEventos().subscribe((eventos: EventoReproduccion[]) => {
       // ¡CORREGIDO! Usamos resultadoTacto === 'Positivo (Gestante)'
       const gestaciones = eventos.filter((e: EventoReproduccion) => e.resultadoTacto === 'Positivo (Gestante)');
       this.vacasGestantes = gestaciones.length;

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EventoReproduccion, TipoEventoReproduccion } from '../../core/models/reproduccion.model';
+import { EventoReproduccion } from '../../core/models/reproduccion.model';
 import { ReproduccionService } from '../../core/services/reproduccion.service';
 import { InventarioService } from '../../core/services/inventario.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-reproduccion',
@@ -13,8 +14,11 @@ import { InventarioService } from '../../core/services/inventario.service';
   styleUrls: ['./reproduccion.component.css']
 })
 export class ReproduccionComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
   vistaActual: 'lista' | 'expediente' | 'formulario' = 'lista';
   filtroBusqueda: string = '';
+  filtroGestacion: string = 'todas';
   cargando: boolean = true;
 
   listaEventos: EventoReproduccion[] = [];
@@ -30,23 +34,60 @@ export class ReproduccionComponent implements OnInit {
     private inventarioService: InventarioService
   ) {}
 
-  ngOnInit(): void {
-    this.reproduccionService.getTodosLosEventos().subscribe({
-      next: (eventos) => {
-        this.listaEventos = eventos;
-        this.cargando = false;
+  ngOnInit() {
+    // 1. Leer parámetros de la URL enviados desde el Dashboard
+    this.route.queryParams.subscribe(params => {
+      if (params['filtro'] === 'gestantes') {
+        this.filtroGestacion = 'gestantes';
       }
     });
 
+    // 2. Cargar el inventario (solo hembras)
     this.inventarioService.getAnimales().subscribe({
-      next: (animales) => {
-        // FILTRO ESTRELLA: Solo guardamos las Hembras para este módulo
+      next: (animales: any[]) => {
         this.hembrasInventario = animales.filter(a => a.genero === 'Hembra');
+      }
+    });
+
+    // 3. Cargar TODO el historial reproductivo
+    this.reproduccionService.getEventos().subscribe({
+      next: (eventos: EventoReproduccion[]) => {
+        this.listaEventos = eventos;
+      },
+      error: (error: any) => { // <-- CORRECCIÓN AQUÍ: ': any' añadido
+        console.error('Error al cargar eventos reproductivos:', error);
       }
     });
   }
 
-get expedientesFiltrados() {
+  aplicarFiltros() {
+    // La reactividad de Angular llamará al getter expedientesFiltrados automáticamente
+  }
+
+  // Función que determina si una vaca está preñada basándose en sus eventos
+  esVacaGestante(animalId: string): boolean {
+    if (!this.listaEventos || this.listaEventos.length === 0) return false;
+    
+    // Filtrar eventos de esta vaca y ordenarlos por fecha (el más reciente primero)
+    const eventosAnimal = this.listaEventos
+      .filter(e => e.animalId === animalId)
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+
+    // Buscamos el último diagnóstico positivo y el último parto
+    const ultimoTactoPositivo = eventosAnimal.find(e => e.tipo === 'Diagnóstico de Gestación' && e.resultadoTacto === 'Positivo (Gestante)');
+    const ultimoParto = eventosAnimal.find(e => e.tipo === 'Parto');
+
+    if (ultimoTactoPositivo) {
+      // Si tuvo un tacto positivo pero aún no tiene ningún parto registrado, ESTÁ GESTANTE.
+      if (!ultimoParto) return true;
+      // Si tuvo un tacto positivo DESPUÉS de su último parto, ESTÁ GESTANTE.
+      return new Date(ultimoTactoPositivo.fecha) > new Date(ultimoParto.fecha);
+    }
+
+    return false;
+  }
+
+  get expedientesFiltrados() {
     const ordenEtapas: { [key: string]: number } = {
       'Ternera': 1,
       'Becerra': 2,
@@ -56,8 +97,15 @@ get expedientesFiltrados() {
     };
 
     let filtrados = this.hembrasInventario.filter(animal => {
-      return (animal.areteSiniiga?.toLowerCase().includes(this.filtroBusqueda.toLowerCase()) ||
+      // Filtro de Texto
+      const coincideTexto = (animal.areteSiniiga?.toLowerCase().includes(this.filtroBusqueda.toLowerCase()) ||
               (animal.nombreOpcional && animal.nombreOpcional.toLowerCase().includes(this.filtroBusqueda.toLowerCase())));
+      
+      // Filtro de Gestación
+      const esGestante = this.esVacaGestante(animal.id);
+      const coincideGestacion = this.filtroGestacion === 'todas' ? true : esGestante;
+
+      return coincideTexto && coincideGestacion;
     });
 
     return filtrados.sort((a, b) => {
